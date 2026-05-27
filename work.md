@@ -1,6 +1,6 @@
 # Split Work Plan
 
-## 🟢 Week 1 — Setup & Foundation
+## Week 1 — Setup & Foundation
 
 ### Developer 1 (Main)
 
@@ -22,7 +22,7 @@
 - NextAuth setup
 - Authentication backend + login UI
 
-## 🟡 Week 2 — Core Travel Features
+## Week 2 — Core Travel Features
 
 ### Developer 1 (Main)
 
@@ -42,7 +42,7 @@
 - UI component support
 - Form validation + styling
 
-## 🔵 Week 3 — Smart Features & Integrations
+## Week 3 — Smart Features & Integrations
 
 ### Developer 1 (Main)
 
@@ -62,7 +62,7 @@
 - Assist API testing
 - Support weather/currency UI
 
-## 🟣 Week 4 — Finalization & Deployment
+## Week 4 — Finalization & Deployment
 
 ### Developer 1 (Main)
 
