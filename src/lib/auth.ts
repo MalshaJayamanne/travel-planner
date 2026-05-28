@@ -1,26 +1,61 @@
-import { sign, verify, JwtPayload } from 'jsonwebtoken';
+import { prisma } from "@/lib/prisma";
+import { verifyPassword } from "@/lib/password";
+import type { NextAuthOptions } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
 
-// Load secret from environment (server‑only)
-const JWT_SECRET = process.env.JWT_SECRET;
+export const authOptions: NextAuthOptions = {
+  session: {
+    strategy: "jwt",
+  },
+  pages: {
+    signIn: "/auth",
+  },
+  providers: [
+    CredentialsProvider({
+      name: "Email and password",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        const email = credentials?.email?.trim().toLowerCase();
+        const password = credentials?.password;
 
-if (!JWT_SECRET) {
-  throw new Error('JWT_SECRET is not defined in environment');
-}
+        if (!email || !password) {
+          return null;
+        }
 
-/**
- * Create a signed JWT for a given payload.
- * @param payload - Object to embed in the token (e.g., { userId: string })
- * @param expiresIn - Expiration time (default 1h)
- */
-export function createToken(payload: JwtPayload, expiresIn: string | number = '1h'): string {
-  return sign(payload, JWT_SECRET, { expiresIn });
-}
+        const user = await prisma.user.findUnique({
+          where: { email },
+        });
 
-/**
- * Verify and decode a JWT.
- * @param token - JWT string from Authorization header
- * @returns decoded payload if valid, otherwise throws
- */
-export function verifyToken(token: string): JwtPayload {
-  return verify(token, JWT_SECRET) as JwtPayload;
-}
+        if (!user || !verifyPassword(password, user.passwordHash)) {
+          return null;
+        }
+
+        return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          image: user.image,
+        };
+      },
+    }),
+  ],
+  callbacks: {
+    jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+      }
+
+      return token;
+    },
+    session({ session, token }) {
+      if (session.user && token.id) {
+        session.user.id = token.id as string;
+      }
+
+      return session;
+    },
+  },
+};
