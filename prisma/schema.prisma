@@ -7,36 +7,39 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(cuid())
-  name      String?
-  email     String    @unique
-  image     String?
-  createdAt DateTime  @default(now())
-  expenses  Expense[]
-  trips     Trip[]
+  id           String       @id @default(cuid())
+  email        String       @unique
+  passwordHash String?
+  name         String?
+  createdAt    DateTime     @default(now())
+  trips        Trip[]
+  preferences  Preference[]
 }
 
 model Trip {
-  id          String    @id @default(cuid())
-  title       String
-  destination String
-  startDate   DateTime
-  endDate     DateTime
-  budget      Float
+  id          String      @id @default(cuid())
   userId      String
-  createdAt   DateTime  @default(now())
-  expenses    Expense[]
-  user        User      @relation(fields: [userId], references: [id])
+  destination String
+  budget      Float?
+  startDate   DateTime?
+  endDate     DateTime?
+  createdAt   DateTime    @default(now())
+  user        User        @relation(fields: [userId], references: [id])
+  itineraries Itinerary[]
 }
 
-model Expense {
-  id       String   @id @default(cuid())
-  title    String
-  amount   Float
-  category String
-  date     DateTime @default(now())
-  tripId   String
-  userId   String
-  trip     Trip     @relation(fields: [tripId], references: [id])
-  user     User     @relation(fields: [userId], references: [id])
+model Itinerary {
+  id         String @id @default(cuid())
+  tripId     String
+  day        Int
+  activities String
+  trip       Trip   @relation(fields: [tripId], references: [id])
+}
+
+model Preference {
+  id          String @id @default(cuid())
+  userId      String
+  interests   String
+  travelStyle String
+  user        User   @relation(fields: [userId], references: [id])
 }
