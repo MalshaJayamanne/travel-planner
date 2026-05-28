@@ -11,53 +11,24 @@ This project is being developed as a full travel planner with:
 - maps, weather, and currency integration
 - photo gallery and travel story features
 
-## Recommended Monorepo Structure
+## Project Structure
 
 ```text
 travel-planner/
-├── frontend/          # Next.js UI
-├── backend/           # API + services
-├── prisma/            # Database schema
-├── shared/            # Shared types, constants, utils
-├── .env
-└── README.md
-```
-
-### Frontend Structure
-
-```text
-frontend/
-├── app/
-│   ├── page.tsx
-│   ├── dashboard/
-│   ├── trips/
-│   ├── expenses/
-│   └── auth/
-├── components/
-├── hooks/
-├── store/
-├── styles/
-└── lib/
-```
-
-### Backend Structure
-
-```text
-backend/
-├── controllers/
-├── routes/
-├── services/
-├── middlewares/
-└── utils/
-```
-
-### Shared Module
-
-```text
-shared/
-├── types/
-├── constants/
-└── utils/
+├── src/
+│   ├── app/           # Next.js App Router & API routes
+│   ├── components/    # Reusable React components
+│   ├── hooks/         # Custom React hooks
+│   ├── lib/           # Utility functions (e.g. Prisma client)
+│   ├── services/      # Backend services & third-party APIs
+│   ├── store/         # Global state management
+│   ├── styles/        # Global CSS and Tailwind styles
+│   └── types/         # TypeScript type definitions
+├── prisma/            # Database schema and migrations
+├── shared/            # Shared logic
+├── public/            # Static assets
+├── .env               # Environment variables
+└── package.json       # Project dependencies
 ```
 
 ### System Flow
