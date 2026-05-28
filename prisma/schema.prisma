@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,42 +7,36 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   name      String?
-  email     String   @unique
+  email     String    @unique
   image     String?
-  createdAt DateTime @default(now())
-
-  trips     Trip[]
+  createdAt DateTime  @default(now())
   expenses  Expense[]
+  trips     Trip[]
 }
 
 model Trip {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   title       String
   destination String
   startDate   DateTime
   endDate     DateTime
   budget      Float
-
   userId      String
-  user        User     @relation(fields: [userId], references: [id])
-
+  createdAt   DateTime  @default(now())
   expenses    Expense[]
-
-  createdAt   DateTime @default(now())
+  user        User      @relation(fields: [userId], references: [id])
 }
 
 model Expense {
-  id        String   @id @default(cuid())
-  title     String
-  amount    Float
-  category  String
-  date      DateTime @default(now())
-
-  tripId    String
-  trip      Trip     @relation(fields: [tripId], references: [id])
-
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  id       String   @id @default(cuid())
+  title    String
+  amount   Float
+  category String
+  date     DateTime @default(now())
+  tripId   String
+  userId   String
+  trip     Trip     @relation(fields: [tripId], references: [id])
+  user     User     @relation(fields: [userId], references: [id])
 }
