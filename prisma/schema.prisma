@@ -8,24 +8,43 @@ datasource db {
 
 model User {
   id           String       @id @default(cuid())
-  email        String       @unique
-  passwordHash String?
   name         String?
+  email        String       @unique
+  passwordHash String
+  image        String?
   createdAt    DateTime     @default(now())
+
   trips        Trip[]
+  expenses     Expense[]
   preferences  Preference[]
 }
 
 model Trip {
   id          String      @id @default(cuid())
-  userId      String
+  title       String
   destination String
-  budget      Float?
-  startDate   DateTime?
-  endDate     DateTime?
+  startDate   DateTime
+  endDate     DateTime
+  budget      Float
+  userId      String
   createdAt   DateTime    @default(now())
+
   user        User        @relation(fields: [userId], references: [id])
+  expenses    Expense[]
   itineraries Itinerary[]
+}
+
+model Expense {
+  id        String   @id @default(cuid())
+  title     String
+  amount    Float
+  category  String
+  date      DateTime @default(now())
+  tripId    String
+  userId    String
+
+  trip      Trip     @relation(fields: [tripId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Itinerary {
@@ -33,6 +52,7 @@ model Itinerary {
   tripId     String
   day        Int
   activities String
+
   trip       Trip   @relation(fields: [tripId], references: [id])
 }
 
@@ -41,5 +61,6 @@ model Preference {
   userId      String
   interests   String
   travelStyle String
+
   user        User   @relation(fields: [userId], references: [id])
 }
