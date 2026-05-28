@@ -1,0 +1,36 @@
+next
+react
+react-dom
+typescript
+
+tailwindcss
+postcss
+autoprefixer
+
+prisma
+@prisma/client
+
+next-auth
+
+axios
+
+zustand
+@tanstack/react-query
+
+recharts
+
+clsx
+tailwind-merge
+
+cloudinary
+
+leaflet
+react-leaflet
+
+zod
+
+@google/generative-ai
+
+
+#install command:
+npm install next react react-dom typescript tailwindcss postcss autoprefixer prisma @prisma/client next-auth axios zustand @tanstack/react-query recharts clsx tailwind-merge cloudinary leaflet react-leaflet zod
