@@ -1,21 +1,23 @@
-import { verify } from "jsonwebtoken";
+import { prisma } from "@/lib/prisma";
+import { NextResponse } from "next/server";
 
-export async function GET(req: Request) {
-  const authHeader = req.headers.get("authorization");
-  if (!authHeader) {
-    return NextResponse.json({ success: false, error: "Missing Authorization header" }, { status: 401 });
-  }
-  const token = authHeader.split(" ")[1];
+export async function GET() {
   try {
-    verify(token, process.env.JWT_SECRET!);
-  } catch (e) {
-    return NextResponse.json({ success: false, error: "Invalid token" }, { status: 401 });
-  }
-  try {
-    const users = await prisma.user.findMany();
+    await prisma.$queryRaw`SELECT 1`;
+
+    const [userCount, tripCount, expenseCount] = await Promise.all([
+      prisma.user.count(),
+      prisma.trip.count(),
+      prisma.expense.count(),
+    ]);
+
     return NextResponse.json({
       success: true,
-      data: users,
+      tables: {
+        users: userCount,
+        trips: tripCount,
+        expenses: expenseCount,
+      },
       message: "Database connected successfully",
     });
   } catch (error) {
@@ -23,6 +25,7 @@ export async function GET(req: Request) {
       {
         success: false,
         error: "Database connection failed",
+        detail: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 }
     );
