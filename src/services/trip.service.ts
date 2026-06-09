@@ -1,7 +1,8 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 
 export const TripService = {
-  create: async (data: any) => {
+  create: async (data: Prisma.TripCreateInput) => {
     return prisma.trip.create({ data });
   },
 

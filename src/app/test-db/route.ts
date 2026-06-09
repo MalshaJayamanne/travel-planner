@@ -10,7 +10,7 @@ export async function GET() {
       data: users,
       message: "Database connected successfully 🚀",
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       {
         success: false,

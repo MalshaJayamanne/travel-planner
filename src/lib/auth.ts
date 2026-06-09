@@ -1,7 +1,7 @@
-import { sign, verify, JwtPayload } from 'jsonwebtoken';
+import { sign, verify, JwtPayload, Secret, SignOptions } from 'jsonwebtoken';
 
 // Load secret from environment (server‑only)
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET ?? "";
 
 if (!JWT_SECRET) {
   throw new Error('JWT_SECRET is not defined in environment');
@@ -12,8 +12,9 @@ if (!JWT_SECRET) {
  * @param payload - Object to embed in the token (e.g., { userId: string })
  * @param expiresIn - Expiration time (default 1h)
  */
-export function createToken(payload: JwtPayload, expiresIn: string | number = '1h'): string {
-  return sign(payload, JWT_SECRET, { expiresIn });
+export function createToken(payload: JwtPayload, expiresIn: SignOptions['expiresIn'] = '1h'): string {
+  const secret: Secret = JWT_SECRET;
+  return sign(payload, secret, { expiresIn });
 }
 
 /**
