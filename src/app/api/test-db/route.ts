@@ -1,7 +1,21 @@
-import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { verifyToken } from "@/lib/auth";
 
-export async function GET() {
+export async function GET(req: Request) {
+  const authHeader = req.headers.get("authorization");
+  if (!authHeader) {
+    return NextResponse.json({ success: false, error: "Missing Authorization header" }, { status: 401 });
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  try {
+    verifyToken(token);
+  } catch {
+    return NextResponse.json({ success: false, error: "Invalid token" }, { status: 401 });
+  }
+
   try {
     await prisma.$queryRaw`SELECT 1`;
 
@@ -20,7 +34,7 @@ export async function GET() {
       },
       message: "Database connected successfully",
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       {
         success: false,

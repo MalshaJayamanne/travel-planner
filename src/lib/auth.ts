@@ -1,33 +1,21 @@
-import { prisma } from "@/lib/prisma";
-import { verifyPassword } from "@/lib/password";
-import type { NextAuthOptions } from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
+import { sign, verify, JwtPayload, Secret, SignOptions } from 'jsonwebtoken';
 
-export const authOptions: NextAuthOptions = {
-  session: {
-    strategy: "jwt",
-  },
-  pages: {
-    signIn: "/auth",
-  },
-  providers: [
-    CredentialsProvider({
-      name: "Email and password",
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
-      },
-      async authorize(credentials) {
-        const email = credentials?.email?.trim().toLowerCase();
-        const password = credentials?.password;
+// Load secret from environment (server‑only)
+const JWT_SECRET = process.env.JWT_SECRET ?? "";
 
         if (!email || !password) {
           return null;
         }
 
-        const user = await prisma.user.findUnique({
-          where: { email },
-        });
+/**
+ * Create a signed JWT for a given payload.
+ * @param payload - Object to embed in the token (e.g., { userId: string })
+ * @param expiresIn - Expiration time (default 1h)
+ */
+export function createToken(payload: JwtPayload, expiresIn: SignOptions['expiresIn'] = '1h'): string {
+  const secret: Secret = JWT_SECRET;
+  return sign(payload, secret, { expiresIn });
+}
 
         if (!user || !verifyPassword(password, user.passwordHash)) {
           return null;

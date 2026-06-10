@@ -20,7 +20,7 @@ export async function GET() {
       },
       message: "Database connected successfully",
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       {
         success: false,
