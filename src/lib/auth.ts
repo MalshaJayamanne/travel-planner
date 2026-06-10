@@ -3,9 +3,9 @@ import { sign, verify, JwtPayload, Secret, SignOptions } from 'jsonwebtoken';
 // Load secret from environment (server‑only)
 const JWT_SECRET = process.env.JWT_SECRET ?? "";
 
-if (!JWT_SECRET) {
-  throw new Error('JWT_SECRET is not defined in environment');
-}
+        if (!email || !password) {
+          return null;
+        }
 
 /**
  * Create a signed JWT for a given payload.
@@ -17,11 +17,33 @@ export function createToken(payload: JwtPayload, expiresIn: SignOptions['expires
   return sign(payload, secret, { expiresIn });
 }
 
-/**
- * Verify and decode a JWT.
- * @param token - JWT string from Authorization header
- * @returns decoded payload if valid, otherwise throws
- */
-export function verifyToken(token: string): JwtPayload {
-  return verify(token, JWT_SECRET) as JwtPayload;
-}
+        if (!user || !verifyPassword(password, user.passwordHash)) {
+          return null;
+        }
+
+        return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          image: user.image,
+        };
+      },
+    }),
+  ],
+  callbacks: {
+    jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+      }
+
+      return token;
+    },
+    session({ session, token }) {
+      if (session.user && token.id) {
+        session.user.id = token.id as string;
+      }
+
+      return session;
+    },
+  },
+};

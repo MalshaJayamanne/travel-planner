@@ -1,4 +1,11 @@
+import { AuthProvider } from "@/components/auth-provider";
+import type { Metadata } from "next";
 import "./globals.css";
+
+export const metadata: Metadata = {
+  title: "Travel Planner",
+  description: "Plan trips, budgets, and travel details in one place.",
+};
 
 export default function RootLayout({
   children,
@@ -7,7 +14,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   );
 }

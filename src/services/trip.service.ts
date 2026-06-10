@@ -1,5 +1,8 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import type { Trip } from "@/types/trip";
+
+type CreateTripInput = Omit<Trip, "id">;
 
 export const TripService = {
   create: async (data: Prisma.TripCreateInput) => {
