@@ -1,5 +1,5 @@
 import { hashPassword } from "@/lib/password";
-import { prisma } from "@/lib/prisma";
+import { createUserRecord, findUserByEmail } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -10,41 +10,43 @@ const registerSchema = z.object({
 });
 
 export async function POST(req: Request) {
-  const parsed = registerSchema.safeParse(await req.json());
+  try {
+    const parsed = registerSchema.safeParse(await req.json());
 
-  if (!parsed.success) {
-    return NextResponse.json(
-      { error: "Please provide a valid name, email, and password." },
-      { status: 400 }
-    );
-  }
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Please provide a valid name, email, and password." },
+        { status: 400 }
+      );
+    }
 
-  const { name, password } = parsed.data;
-  const email = parsed.data.email.toLowerCase();
+    const { name, password } = parsed.data;
+    const email = parsed.data.email.toLowerCase();
 
-  const existingUser = await prisma.user.findUnique({
-    where: { email },
-  });
+    const existingUser = await findUserByEmail(email);
 
-  if (existingUser) {
-    return NextResponse.json(
-      { error: "An account already exists for this email." },
-      { status: 409 }
-    );
-  }
+    if (existingUser) {
+      return NextResponse.json(
+        { error: "An account already exists for this email." },
+        { status: 409 }
+      );
+    }
 
-  const user = await prisma.user.create({
-    data: {
+    const user = await createUserRecord({
       name,
       email,
       passwordHash: hashPassword(password),
-    },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-    },
-  });
+    });
 
-  return NextResponse.json({ user }, { status: 201 });
+    return NextResponse.json({ user }, { status: 201 });
+  } catch (error) {
+    console.error("Registration failed:", error);
+    return NextResponse.json(
+      {
+        error: "Registration failed. Please try again later.",
+        detail: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 }
+    );
+  }
 }

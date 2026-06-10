@@ -34,7 +34,7 @@ export async function GET(req: Request) {
       },
       message: "Database connected successfully",
     });
-  } catch {
+  } catch (error) {
     return NextResponse.json(
       {
         success: false,

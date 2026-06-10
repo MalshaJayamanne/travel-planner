@@ -10,12 +10,17 @@ type Mode = "login" | "register";
 export default function AuthPage() {
   const router = useRouter();
   const { status } = useSession();
+  const [mounted, setMounted] = useState(false);
   const [mode, setMode] = useState<Mode>("login");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -63,6 +68,10 @@ export default function AuthPage() {
     } finally {
       setIsSubmitting(false);
     }
+  }
+
+  if (!mounted) {
+    return null;
   }
 
   return (
