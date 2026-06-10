@@ -35,7 +35,8 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        const user = await findUserByEmail(credentials.email as string);
+        const email = (credentials.email as string).toLowerCase();
+        const user = await findUserByEmail(email);
 
         if (!user || !verifyPassword(credentials.password as string, user.passwordHash)) {
           return null;
