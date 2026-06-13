@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
+import Link from "next/link";
 import type { Trip } from "@/types/trip";
 
 type Preference = {
@@ -346,20 +347,22 @@ export function TripPlanner() {
             </div>
           ) : (
             trips.map((trip) => (
-              <article className="rounded-lg border border-slate-200 p-4" key={trip.id}>
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <h3 className="font-semibold text-slate-900">{trip.title}</h3>
-                    <p className="mt-1 text-sm text-slate-600">{trip.destination}</p>
+              <Link href={`/trips/${trip.id}`} key={trip.id} className="block transition-transform hover:scale-[1.01]">
+                <article className="rounded-lg border border-slate-200 p-4 h-full bg-white transition hover:border-emerald-300 hover:shadow-sm">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <h3 className="font-semibold text-slate-900 transition">{trip.title}</h3>
+                      <p className="mt-1 text-sm text-slate-600">{trip.destination}</p>
+                    </div>
+                    <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+                      ${trip.budget.toLocaleString()}
+                    </span>
                   </div>
-                  <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
-                    ${trip.budget.toLocaleString()}
-                  </span>
-                </div>
-                <p className="mt-3 text-sm text-slate-600">
-                  {new Date(trip.startDate).toLocaleDateString()} - {new Date(trip.endDate).toLocaleDateString()}
-                </p>
-              </article>
+                  <p className="mt-3 text-sm text-slate-600">
+                    {new Date(trip.startDate).toLocaleDateString()} - {new Date(trip.endDate).toLocaleDateString()}
+                  </p>
+                </article>
+              </Link>
             ))
           )}
         </div>

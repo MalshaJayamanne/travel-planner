@@ -1,13 +1,30 @@
 import { AppShell } from "@/components/app-shell";
 import { authOptions } from "@/lib/auth";
+import { prisma as db } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
+
+  if (!session?.user?.id) {
+    redirect("/auth/login");
+  }
+
+  const userId = session.user.id;
+
+  const [trips, upcomingTrips, expenses] = await Promise.all([
+    db.trip.count({ where: { userId } }),
+    db.trip.count({ where: { userId, startDate: { gt: new Date() } } }),
+    db.trip.findMany({ where: { userId }, select: { budget: true } }) // Approximate expenses with total budget for now since Expenses aren't fully implemented
+  ]);
+
+  const totalBudget = expenses.reduce((acc, t) => acc + t.budget, 0);
+
   const stats = [
-    { label: "Total trips", value: "0" },
-    { label: "Upcoming trips", value: "0" },
-    { label: "Logged expenses", value: "$0.00" },
+    { label: "Total trips", value: trips.toString() },
+    { label: "Upcoming trips", value: upcomingTrips.toString() },
+    { label: "Estimated expenses", value: `$${totalBudget.toLocaleString()}` },
   ];
 
   return (

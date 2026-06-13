@@ -3,13 +3,15 @@
 import { SignOutButton } from "@/components/sign-out-button";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bell, Compass, Home, LogOut, Settings, User, Wallet } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { Bell, Compass, Home, LogOut, Settings, User, Wallet, Heart } from "lucide-react";
 import type { ReactNode } from "react";
 
 const navItems = [
   { href: "/dashboard", label: "Home", icon: Home },
   { href: "/trips", label: "Trips", icon: Compass },
   { href: "/budget", label: "Budget", icon: Wallet },
+  { href: "/wishlist", label: "Wishlist", icon: Heart },
   { href: "/profile", label: "Profile", icon: User },
 ];
 
@@ -25,10 +27,16 @@ type AppShellProps = {
   // Kept for backward compatibility with pages that still pass these
   title?: string;
   subtitle?: string;
+  backLink?: string;
 };
 
-export function AppShell({ children, userEmail }: AppShellProps) {
+export function AppShell({ children, userEmail, backLink }: AppShellProps) {
   const pathname = usePathname();
+  const { data: session } = useSession();
+  
+  // Use session email if not provided via props (for backward compatibility)
+  const displayEmail = userEmail || session?.user?.email;
+  const avatarUrl = session?.user?.image || `https://api.dicebear.com/7.x/notionists/svg?seed=${displayEmail || 'User'}`;
 
   return (
     <div className="min-h-screen bg-[var(--color-brand-bg)] text-slate-900 flex font-sans">
@@ -102,26 +110,31 @@ export function AppShell({ children, userEmail }: AppShellProps) {
           </nav>
 
           <div className="flex items-center gap-6">
-            <button className="text-slate-400 hover:text-slate-600 transition-colors">
+            <button className="text-slate-400 hover:text-slate-600 transition-colors" title="Notifications">
               <Bell className="w-5 h-5" />
             </button>
-            <button className="text-slate-400 hover:text-slate-600 transition-colors">
+            <Link href="/profile" className="text-slate-400 hover:text-[var(--color-brand-green)] transition-colors" title="Settings">
               <Settings className="w-5 h-5" />
-            </button>
-            {userEmail && (
-              <SignOutButton className="text-slate-400 hover:text-[var(--color-brand-green)] transition-colors" title="Logout">
+            </Link>
+            {displayEmail && (
+              <SignOutButton className="text-slate-400 hover:text-red-500 transition-colors" title="Logout">
                 <LogOut className="w-5 h-5" />
               </SignOutButton>
             )}
-            <div className="w-8 h-8 rounded-full bg-slate-200 overflow-hidden border border-slate-300">
-              {/* Placeholder Avatar */}
-              <img src="https://api.dicebear.com/7.x/notionists/svg?seed=Felix" alt="User" className="w-full h-full object-cover" />
-            </div>
+            <Link href="/profile" className="w-9 h-9 rounded-full bg-slate-200 overflow-hidden border-2 border-transparent hover:border-[var(--color-brand-green)] transition-colors shadow-sm focus:outline-none focus:border-[var(--color-brand-green)]">
+              <img src={avatarUrl} alt="User Avatar" className="w-full h-full object-cover" />
+            </Link>
           </div>
         </header>
 
         {/* Page Content */}
         <main className="flex-1 p-10 max-w-6xl mx-auto w-full">
+          {backLink && (
+            <Link href={backLink} className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-[var(--color-brand-green)] mb-6 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><path d="m15 18-6-6 6-6"/></svg>
+              Back
+            </Link>
+          )}
           {children}
         </main>
       </div>

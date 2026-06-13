@@ -47,12 +47,12 @@
 ### Developer 1 (Main)
 
 #### AI + Maps + APIs
-- [ ] AI itinerary generator
-- [ ] Gemini/OpenAI integration
-- [ ] Prompt engineering
-- [ ] Maps integration
-- [ ] Route display
-- [ ] Weather integration
+- [x] AI itinerary generator
+- [x] Gemini/OpenAI integration
+- [x] Prompt engineering
+- [x] Maps integration
+- [x] Route display
+- [x] Weather integration
 
 ### Developer 2 (Support)
 
