@@ -7,9 +7,9 @@
 #### Frontend + Project Structure
 - [x] Create Next.js project
 - [x] Setup folder structure
-- [ ] Tailwind + ShadCN setup
-- [ ] Dashboard layout UI
-- [ ] Navbar + Sidebar
+- [x] Tailwind + ShadCN setup
+- [x] Dashboard layout UI
+- [x] Navbar + Sidebar
 - [x] Basic pages setup
 
 ### Developer 2 (Support)
@@ -20,27 +20,27 @@
 - [x] Database schema
 - [x] Prisma migrations
 - [x] NextAuth setup
-- [ ] Authentication backend + login UI
+- [x] Authentication backend + login UI
 
 ## Week 2 — Core Travel Features
 
 ### Developer 1 (Main)
 
 #### Trip + Preferences Modules
-- [ ] Trip Planner frontend
-- [ ] Trip CRUD backend
-- [ ] Travel Preferences UI
-- [ ] Preferences API
-- [ ] Budget calculator
-- [ ] Basic dashboard view
+- [x] Trip Planner frontend
+- [x] Trip CRUD backend
+- [x] Travel Preferences UI
+- [x] Preferences API
+- [x] Budget calculator
+- [x] Basic dashboard view
 
 ### Developer 2 (Support)
 
 #### Supporting Features
-- [ ] Wishlist frontend + backend
-- [ ] Wishlist APIs
-- [ ] UI component support
-- [ ] Form validation + styling
+- [x] Wishlist frontend + backend
+- [x] Wishlist APIs
+- [x] UI component support
+- [x] Form validation + styling
 
 ## Week 3 — Smart Features & Integrations
 

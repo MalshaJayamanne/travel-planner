@@ -1,18 +1,18 @@
 import { AppShell } from "@/components/app-shell";
-import { TripPlanner } from "@/components/trip-planner";
+import { WishlistManager } from "@/components/wishlist-manager";
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 
-export default async function TripsPage() {
+export default async function WishlistPage() {
   const session = await getServerSession(authOptions);
 
   return (
     <AppShell
-      subtitle="Create and manage travel plans"
-      title="Trips"
+      subtitle="Curate your next dream destination list"
+      title="Wishlist"
       userEmail={session?.user.email}
     >
-      <TripPlanner />
+      <WishlistManager />
     </AppShell>
   );
 }

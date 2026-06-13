@@ -17,6 +17,19 @@ model User {
   trips        Trip[]
   expenses     Expense[]
   preferences  Preference[]
+  wishlists    Wishlist[]
+}
+
+model Wishlist {
+  id          String   @id @default(cuid())
+  userId      String
+  title       String
+  destination String
+  notes       String
+  priority    String
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id])
 }
 
 model Trip {
