@@ -57,10 +57,15 @@
 ### Developer 2 (Support)
 
 #### Utilities + Assistance
-- [ ] Currency converter frontend
-- [ ] Currency API backend
-- [ ] Assist API testing
-- [ ] Support weather/currency UI
+- [x] Currency converter frontend (`currency-converter.tsx`)
+- [x] Currency API backend (`/api/currency/convert`, `/api/currency/rates`)
+- [x] Currency service (`services/currency.ts` — Frankfurter ECB API)
+- [x] Currency widget (`currency-widget.tsx` — live compact rates)
+- [x] Currency page (`/currency` — full-page converter)
+- [x] Assist API testing (weather + currency APIs validated)
+- [x] Enhanced weather widget (feelsLike, humidity, wind, dynamic gradients)
+- [x] Currency widget embedded in Dashboard + Budget pages
+- [x] Currency nav item added to sidebar
 
 ## Week 4 — Finalization & Deployment
 

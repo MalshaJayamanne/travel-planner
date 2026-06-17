@@ -2,15 +2,16 @@
 
 import { SignOutButton } from "@/components/sign-out-button";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { Bell, Compass, Home, LogOut, Settings, User, Wallet, Heart } from "lucide-react";
+import { Bell, Compass, Home, LogOut, Settings, User, Wallet, Heart, DollarSign } from "lucide-react";
 import type { ReactNode } from "react";
 
 const navItems = [
   { href: "/dashboard", label: "Home", icon: Home },
   { href: "/trips", label: "Trips", icon: Compass },
   { href: "/budget", label: "Budget", icon: Wallet },
+  { href: "/currency", label: "Currency", icon: DollarSign },
   { href: "/wishlist", label: "Wishlist", icon: Heart },
   { href: "/profile", label: "Profile", icon: User },
 ];
@@ -32,6 +33,7 @@ type AppShellProps = {
 
 export function AppShell({ children, userEmail, backLink }: AppShellProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const { data: session } = useSession();
   
   // Use session email if not provided via props (for backward compatibility)
@@ -78,7 +80,12 @@ export function AppShell({ children, userEmail, backLink }: AppShellProps) {
         </nav>
 
         <div className="p-6 mt-auto">
-          <button className="w-full bg-[var(--color-brand-green)] hover:bg-[var(--color-brand-green-hover)] text-white rounded-lg py-3 text-sm font-medium transition-colors shadow-sm">
+          <button
+            id="sidebar-new-trip-btn"
+            onClick={() => router.push("/trips")}
+            className="w-full bg-[var(--color-brand-green)] hover:bg-[var(--color-brand-green-hover)] text-white rounded-lg py-3 text-sm font-medium transition-colors shadow-sm flex items-center justify-center gap-2"
+          >
+            <span className="text-lg leading-none">+</span>
             New Trip
           </button>
         </div>
