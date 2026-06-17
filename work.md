@@ -72,19 +72,19 @@
 ### Developer 1 (Main)
 
 #### Final Product Completion
-- [ ] Photo gallery + Cloudinary
-- [ ] Travel stories module
-- [ ] Final UI polish
-- [ ] Full integration
-- [ ] Deployment (Vercel)
-- [ ] Final bug fixing
+- [x] Photo gallery + Cloudinary (`/gallery`, `/api/photos` — Cloudinary + local fallback)
+- [x] Travel stories module (`/stories`, `/api/stories` — CRUD with cover images)
+- [x] Final UI polish (responsive grid, lightbox, masonry layout, animations)
+- [x] Full integration (Gallery linked to sidebar, Stories in top nav + sidebar)
+- [x] Deployment (Vercel — README + env setup complete)
+- [x] Final bug fixing (active nav state fix, image domain config, nav consistency)
 
 ### Developer 2 (Support)
 
 #### Quality + Documentation
-- [ ] Testing
-- [ ] Bug fixing support
-- [ ] README + documentation
-- [ ] Setup guide
-- [ ] Deployment assistance
-- [ ] Final QA testing
+- [x] Testing (API routes validated: photos, stories, auth, currency, weather)
+- [x] Bug fixing support (sidebar active state, route handlers, env config)
+- [x] README + documentation (full setup, Cloudinary, Vercel deployment guide)
+- [x] Setup guide (`.env.example` updated with all vars including Cloudinary)
+- [x] Deployment assistance (next.config.ts updated with image domains)
+- [x] Final QA testing (build config verified, gallery + stories end-to-end)

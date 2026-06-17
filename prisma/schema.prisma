@@ -18,6 +18,8 @@ model User {
   expenses     Expense[]
   preferences  Preference[]
   wishlists    Wishlist[]
+  photos       Photo[]
+  stories      Story[]
 }
 
 model Wishlist {
@@ -45,6 +47,7 @@ model Trip {
   user        User        @relation(fields: [userId], references: [id])
   expenses    Expense[]
   itineraries Itinerary[]
+  photos      Photo[]
 }
 
 model Expense {
@@ -77,3 +80,32 @@ model Preference {
 
   user        User   @relation(fields: [userId], references: [id])
 }
+
+model Photo {
+  id        String   @id @default(cuid())
+  userId    String
+  url       String
+  publicId  String?
+  caption   String?
+  location  String?
+  tripId    String?
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  trip      Trip?    @relation(fields: [tripId], references: [id], onDelete: SetNull)
+}
+
+model Story {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  content   String   @db.Text
+  location  String?
+  coverUrl  String?
+  date      DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+

@@ -4,7 +4,7 @@ import { SignOutButton } from "@/components/sign-out-button";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { Bell, Compass, Home, LogOut, Settings, User, Wallet, Heart, DollarSign } from "lucide-react";
+import { Bell, Camera, Compass, Home, LogOut, Settings, User, Wallet, Heart, DollarSign } from "lucide-react";
 import type { ReactNode } from "react";
 
 const navItems = [
@@ -13,6 +13,7 @@ const navItems = [
   { href: "/budget", label: "Budget", icon: Wallet },
   { href: "/currency", label: "Currency", icon: DollarSign },
   { href: "/wishlist", label: "Wishlist", icon: Heart },
+  { href: "/gallery", label: "Gallery", icon: Camera },
   { href: "/profile", label: "Profile", icon: User },
 ];
 
@@ -59,9 +60,7 @@ export function AppShell({ children, userEmail, backLink }: AppShellProps) {
 
         <nav className="flex-1 px-4 space-y-1">
           {navItems.map((item) => {
-            // For this design mockup, we'll force '/trips' or '/stories' active logic 
-            // but normally it's exact match
-            const isActive = pathname === item.href || (pathname === '/stories' && item.href === '/trips');
+            const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
             return (
               <Link
                 key={item.href}

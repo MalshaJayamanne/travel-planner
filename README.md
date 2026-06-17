@@ -1,81 +1,185 @@
-# Travel Planner
+# Horizon Travel Planner
 
-A Next.js travel planning application focused on trip management, budget tracking, AI-assisted itinerary ideas, and travel insights.
+A full-stack AI-powered travel planning application built with **Next.js 16**, **Supabase (PostgreSQL)**, **Prisma ORM**, **NextAuth**, and **Google Gemini AI**.
 
-## Project Overview
-This project is being developed as a full travel planner with:
-- trip creation and management
-- budget and expense tracking
-- wishlist support
-- AI itinerary generation
-- maps, weather, and currency integration
-- photo gallery and travel story features
+---
 
-## Project Structure
+## ✨ Features
 
-```text
-travel-planner/
-├── src/
-│   ├── app/           # Next.js App Router & API routes
-│   ├── components/    # Reusable React components
-│   ├── hooks/         # Custom React hooks
-│   ├── lib/           # Utility functions (e.g. Prisma client)
-│   ├── services/      # Backend services & third-party APIs
-│   ├── store/         # Global state management
-│   ├── styles/        # Global CSS and Tailwind styles
-│   └── types/         # TypeScript type definitions
-├── prisma/            # Database schema and migrations
-├── shared/            # Shared logic
-├── public/            # Static assets
-├── .env               # Environment variables
-└── package.json       # Project dependencies
+| Module | Description |
+|---|---|
+| 🗺️ **Trip Planner** | Create, manage, and track trips with destinations, budgets & dates |
+| 🤖 **AI Itinerary** | Gemini-powered day-by-day itinerary generation |
+| 📸 **Photo Gallery** | Upload & organize travel photos via Cloudinary |
+| 📖 **Travel Stories** | Write and publish user-generated travel stories |
+| 💰 **Budget Tracker** | Expense tracking with category breakdown charts |
+| 💱 **Currency Converter** | Live exchange rates via Frankfurter ECB API |
+| 🌤️ **Weather Widget** | Real-time weather for any destination |
+| 🗺️ **Interactive Map** | Route and destination visualization with Leaflet |
+| ❤️ **Wishlist** | Save dream destinations with priority levels |
+| 👤 **Profile Manager** | User profile with avatar upload support |
+
+---
+
+## 🛠️ Tech Stack
+
+- **Framework**: Next.js 16 (App Router)
+- **Language**: TypeScript
+- **Database**: PostgreSQL via Supabase
+- **ORM**: Prisma 7
+- **Auth**: NextAuth v4 (credentials)
+- **AI**: Google Gemini (`@google/genai`)
+- **Media**: Cloudinary (with local fallback)
+- **Maps**: Leaflet + React Leaflet
+- **Charts**: Recharts
+- **Styling**: Tailwind CSS v4 + ShadCN UI
+
+---
+
+## 🚀 Getting Started
+
+### 1. Clone & Install
+
+```bash
+git clone https://github.com/MalshaJayamanne/travel-planner
+cd travel-planner
+npm install
 ```
 
-### System Flow
+### 2. Set Up Environment Variables
 
-```text
-Frontend (Next.js)
-      ↓
-Backend (API Layer)
-      ↓
-Services (AI, Maps, Weather, Currency)
-      ↓
-Prisma ORM
-      ↓
-PostgreSQL Database
+```bash
+cp .env.example .env.local
 ```
 
-## Documentation
-- [requirements.md](requirements.md) — project requirements and scope
-- [work.md](work.md) — split development plan by week
+Fill in all values in `.env.local` (see the example file for details).
 
-## Getting Started
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-2. Start the development server:
-   ```bash
-   npm run dev
-   ```
-3. Open http://localhost:3000
+### 3. Set Up the Database
 
-## Tech Stack
-- Next.js
-- TypeScript
-- Tailwind CSS
-- ShadCN UI
-- Prisma
-- PostgreSQL
-- NextAuth
+```bash
+npx prisma migrate deploy
+npx prisma generate
+```
 
-## Planned Features
-- Dashboard and travel planning interface
-- Trip CRUD and budget analytics
-- Expense tracking and charts
-- AI itinerary generator
-- Maps, weather, and currency support
-- Cloudinary photo gallery and travel stories
+### 4. Run Development Server
 
-## Deployment
-The final application is planned for deployment on Vercel.
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+---
+
+## ☁️ Cloudinary Setup (Photo Gallery)
+
+The photo gallery supports Cloudinary for production-grade image storage. Without it, photos are saved locally to `public/uploads/` (development only).
+
+1. Create a free account at [cloudinary.com](https://cloudinary.com)
+2. Navigate to **Dashboard → API Keys**
+3. Add to `.env.local`:
+
+```env
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+```
+
+---
+
+## 🌐 Deployment (Vercel)
+
+### 1. Push to GitHub
+
+```bash
+git add .
+git commit -m "feat: Week 4 — finalization & deployment"
+git push origin main
+```
+
+### 2. Connect to Vercel
+
+1. Go to [vercel.com](https://vercel.com) → **New Project**
+2. Import your GitHub repository
+3. Set **Framework Preset** to `Next.js`
+
+### 3. Add Environment Variables
+
+In the Vercel dashboard → **Settings → Environment Variables**, add all variables from `.env.example`:
+
+| Variable | Required |
+|---|---|
+| `DATABASE_URL` | ✅ Yes |
+| `DIRECT_URL` | ✅ Yes |
+| `NEXTAUTH_SECRET` | ✅ Yes |
+| `NEXTAUTH_URL` | ✅ Yes (set to your Vercel domain) |
+| `JWT_SECRET` | ✅ Yes |
+| `GEMINI_API_KEY` | ✅ Yes |
+| `OPENWEATHER_API_KEY` | ✅ Yes |
+| `CLOUDINARY_CLOUD_NAME` | ⚡ Recommended |
+| `CLOUDINARY_API_KEY` | ⚡ Recommended |
+| `CLOUDINARY_API_SECRET` | ⚡ Recommended |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Optional |
+
+> ⚠️ **Important**: Set `NEXTAUTH_URL` to your actual Vercel domain (e.g. `https://travel-planner-xyz.vercel.app`)
+
+### 4. Run Database Migrations on Vercel
+
+After first deploy, run migrations using the Vercel CLI or Vercel's **Post Build Command**:
+
+```
+npx prisma migrate deploy
+```
+
+### 5. Deploy
+
+Click **Deploy** — Vercel will build and deploy your application automatically on every `git push`.
+
+---
+
+## 📁 Project Structure
+
+```
+src/
+├── app/                   # Next.js App Router pages
+│   ├── api/               # API route handlers
+│   │   ├── auth/          # NextAuth endpoints
+│   │   ├── trips/         # Trip CRUD
+│   │   ├── photos/        # Cloudinary photo upload
+│   │   ├── stories/       # Travel stories CRUD
+│   │   ├── currency/      # Currency conversion APIs
+│   │   ├── weather/       # Weather API proxy
+│   │   └── wishlist/      # Wishlist management
+│   ├── dashboard/         # Main dashboard
+│   ├── trips/             # Trip planner page
+│   ├── gallery/           # Photo gallery
+│   ├── stories/           # Travel stories
+│   ├── budget/            # Budget tracker
+│   ├── currency/          # Currency converter
+│   ├── wishlist/          # Wishlist page
+│   ├── explore/           # Explore destinations
+│   └── profile/           # User profile
+├── components/            # Reusable React components
+├── lib/                   # Auth, Prisma, utilities
+├── services/              # External API services
+├── hooks/                 # Custom React hooks
+├── store/                 # Zustand state management
+└── types/                 # TypeScript type definitions
+prisma/
+└── schema.prisma          # Database schema
+```
+
+---
+
+## 👥 Team
+
+| Developer | Role | Weeks |
+|---|---|---|
+| Developer 1 (Main) | Frontend, AI, Maps, Gallery, Stories, Deployment | Weeks 1–4 |
+| Developer 2 (Support) | Backend, Auth, Wishlist, Currency, QA, Docs | Weeks 1–4 |
+
+---
+
+## 📄 License
+
+MIT
