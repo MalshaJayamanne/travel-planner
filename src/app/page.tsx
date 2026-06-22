@@ -89,14 +89,15 @@ const stats = [
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-[#f9f9f7] text-slate-900 font-sans overflow-x-hidden">
+
       {/* ─── NAV ─── */}
-      <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/80 backdrop-blur-md">
+      <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-black/20 backdrop-blur-md transition-all duration-300">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#2a5a40] shadow-sm group-hover:shadow-md transition-shadow">
               <Compass className="h-5 w-5 text-white" />
             </div>
-            <span className="font-serif text-xl font-bold text-[#2a5a40]">
+            <span className="font-serif text-xl font-bold text-white drop-shadow">
               Horizon Travel
             </span>
           </Link>
@@ -106,7 +107,7 @@ export default function HomePage() {
               <a
                 key={item}
                 href={`#${item.toLowerCase()}`}
-                className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"
+                className="text-sm font-medium text-white/80 hover:text-white transition-colors"
               >
                 {item}
               </a>
@@ -117,7 +118,7 @@ export default function HomePage() {
             <Link
               href="/auth/login"
               id="nav-login-btn"
-              className="hidden sm:block text-sm font-semibold text-slate-600 hover:text-[#2a5a40] transition-colors px-4 py-2"
+              className="hidden sm:block text-sm font-semibold text-white/80 hover:text-white transition-colors px-4 py-2"
             >
               Sign in
             </Link>
@@ -133,56 +134,58 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* ─── HERO ─── */}
-      <section className="relative overflow-hidden">
-        {/* Gradient blobs */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -top-40 -left-40 h-[600px] w-[600px] rounded-full bg-[#2a5a40]/8 blur-3xl"
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -top-20 right-0 h-[500px] w-[500px] rounded-full bg-blue-400/8 blur-3xl"
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute top-60 left-1/2 h-[400px] w-[400px] -translate-x-1/2 rounded-full bg-violet-400/6 blur-3xl"
-        />
+      {/* ─── HERO WITH VIDEO BACKGROUND ─── */}
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Video Background */}
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+          poster="/images/hero-poster.jpg"
+        >
+          <source src="/mp4/landing_video1.mp4" type="video/mp4" />
+        </video>
 
-        <div className="mx-auto max-w-7xl px-6 pb-20 pt-20 md:pt-28">
+        {/* Gradient overlay for readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/45 to-black/70" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0d2b1a]/40 via-transparent to-[#0d2b1a]/30" />
+
+        {/* Hero Content */}
+        <div className="relative z-10 mx-auto max-w-5xl px-6 pt-24 pb-20 text-center">
           {/* Badge */}
           <div className="flex justify-center mb-8">
-            <span className="inline-flex items-center gap-2 rounded-full border border-[#2a5a40]/20 bg-[#EAF0EC] px-4 py-1.5 text-xs font-semibold text-[#2a5a40]">
-              <Sparkles className="h-3.5 w-3.5" />
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 backdrop-blur-sm px-4 py-1.5 text-xs font-semibold text-white/90">
+              <Sparkles className="h-3.5 w-3.5 text-emerald-400" />
               AI-Powered Travel Planning · Now Live
             </span>
           </div>
 
           {/* Headline */}
-          <div className="text-center max-w-4xl mx-auto">
-            <h1 className="font-serif text-5xl font-bold leading-[1.1] tracking-tight text-slate-900 sm:text-6xl md:text-7xl">
-              Your entire trip,{" "}
-              <span className="relative inline-block">
-                <span className="relative z-10 text-[#2a5a40]">beautifully</span>
-                <span
-                  aria-hidden
-                  className="absolute bottom-1 left-0 h-3 w-full -rotate-1 rounded-sm bg-[#2a5a40]/15"
-                />
-              </span>{" "}
-              planned.
-            </h1>
-            <p className="mt-6 text-lg leading-8 text-slate-500 max-w-2xl mx-auto">
-              Plan destinations, track budgets, convert currencies, and generate
-              AI-powered itineraries — all in one beautifully crafted travel workspace.
-            </p>
-          </div>
+          <h1 className="font-serif text-5xl font-bold leading-[1.1] tracking-tight text-white sm:text-6xl md:text-7xl drop-shadow-xl">
+            Your entire trip,{" "}
+            <span className="relative inline-block">
+              <span className="relative z-10 text-emerald-400">beautifully</span>
+              <span
+                aria-hidden
+                className="absolute bottom-1 left-0 h-3 w-full -rotate-1 rounded-sm bg-emerald-500/30"
+              />
+            </span>{" "}
+            planned.
+          </h1>
+
+          <p className="mt-6 text-lg leading-8 text-white/75 max-w-2xl mx-auto drop-shadow">
+            Plan destinations, track budgets, convert currencies, and generate
+            AI-powered itineraries — all in one beautifully crafted travel workspace.
+          </p>
 
           {/* CTAs */}
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
             <Link
               href="/auth/register"
               id="hero-cta-primary"
-              className="group flex items-center gap-2.5 rounded-2xl bg-[#2a5a40] px-7 py-4 text-base font-bold text-white shadow-lg shadow-[#2a5a40]/25 hover:bg-[#1f422e] hover:shadow-xl hover:shadow-[#2a5a40]/30 hover:-translate-y-0.5 transition-all duration-200"
+              className="group flex items-center gap-2.5 rounded-2xl bg-[#2a5a40] px-7 py-4 text-base font-bold text-white shadow-2xl shadow-[#2a5a40]/40 hover:bg-[#1f422e] hover:shadow-3xl hover:-translate-y-1 transition-all duration-200"
             >
               <Plane className="h-5 w-5 group-hover:rotate-12 transition-transform" />
               Start Planning Free
@@ -191,7 +194,7 @@ export default function HomePage() {
             <Link
               href="/auth/login"
               id="hero-cta-secondary"
-              className="flex items-center gap-2 rounded-2xl border-2 border-slate-200 bg-white px-7 py-4 text-base font-bold text-slate-700 shadow-sm hover:border-[#2a5a40] hover:text-[#2a5a40] hover:shadow-md transition-all duration-200"
+              className="flex items-center gap-2 rounded-2xl border-2 border-white/30 bg-white/10 backdrop-blur-sm px-7 py-4 text-base font-bold text-white hover:border-white/60 hover:bg-white/20 transition-all duration-200"
             >
               Sign In
               <ChevronRight className="h-4 w-4" />
@@ -200,106 +203,19 @@ export default function HomePage() {
 
           {/* Social proof */}
           <div className="mt-8 flex justify-center">
-            <div className="flex items-center gap-2 text-sm text-slate-400">
+            <div className="flex items-center gap-2 text-sm text-white/60">
               {[...Array(5)].map((_, i) => (
                 <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
               ))}
               <span className="ml-1">Trusted by travelers worldwide</span>
             </div>
           </div>
+        </div>
 
-          {/* Hero Card Mockup */}
-          <div className="mt-16 mx-auto max-w-5xl">
-            <div className="relative rounded-3xl border border-slate-200/80 bg-white shadow-2xl shadow-slate-200/60 overflow-hidden">
-              {/* Fake browser chrome */}
-              <div className="flex items-center gap-2 border-b border-slate-100 bg-slate-50 px-5 py-4">
-                <div className="flex gap-1.5">
-                  <span className="h-3 w-3 rounded-full bg-red-400" />
-                  <span className="h-3 w-3 rounded-full bg-amber-400" />
-                  <span className="h-3 w-3 rounded-full bg-emerald-400" />
-                </div>
-                <div className="mx-auto flex items-center gap-2 rounded-lg bg-white border border-slate-200 px-4 py-1.5 text-xs text-slate-400">
-                  <span>🔒</span>
-                  horizon-travel.app/dashboard
-                </div>
-              </div>
-
-              {/* App Preview */}
-              <div className="grid md:grid-cols-[240px_1fr] min-h-[380px]">
-                {/* Sidebar */}
-                <div className="border-r border-slate-100 bg-white p-5 hidden md:block">
-                  <div className="mb-6">
-                    <p className="text-xs font-bold text-[#2a5a40] mb-1">Horizon Travel</p>
-                    <p className="text-[10px] text-slate-400 uppercase tracking-widest">Global Explorer</p>
-                  </div>
-                  {[
-                    { icon: "🏠", label: "Home", active: true },
-                    { icon: "✈️", label: "Trips", active: false },
-                    { icon: "💰", label: "Budget", active: false },
-                    { icon: "💱", label: "Currency", active: false },
-                    { icon: "❤️", label: "Wishlist", active: false },
-                  ].map((item) => (
-                    <div
-                      key={item.label}
-                      className={`flex items-center gap-3 rounded-lg px-3 py-2.5 mb-1 text-xs font-medium ${
-                        item.active
-                          ? "bg-[#EAF0EC] text-[#2a5a40]"
-                          : "text-slate-500"
-                      }`}
-                    >
-                      <span>{item.icon}</span>
-                      {item.label}
-                    </div>
-                  ))}
-                </div>
-
-                {/* Dashboard preview */}
-                <div className="bg-[#f9f9f7] p-6">
-                  <div className="mb-5 rounded-2xl bg-gradient-to-r from-[#2a5a40] to-[#3d7a58] p-5 text-white">
-                    <p className="text-xs text-green-200 mb-1">Welcome back</p>
-                    <p className="text-lg font-bold">Ready to explore? ✈️</p>
-                    <p className="text-xs text-green-100 mt-1">3 upcoming trips planned</p>
-                  </div>
-                  <div className="grid grid-cols-3 gap-3 mb-4">
-                    {[
-                      { label: "Total Trips", val: "8", color: "text-[#2a5a40]" },
-                      { label: "Upcoming", val: "3", color: "text-blue-600" },
-                      { label: "Budget", val: "$4,200", color: "text-violet-600" },
-                    ].map((s) => (
-                      <div key={s.label} className="rounded-xl bg-white border border-slate-100 p-3 shadow-sm">
-                        <p className="text-[10px] text-slate-400">{s.label}</p>
-                        <p className={`text-base font-bold mt-1 ${s.color}`}>{s.val}</p>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="rounded-xl bg-white border border-slate-100 p-3 shadow-sm">
-                      <p className="text-[10px] font-bold text-slate-400 mb-2">LIVE RATES</p>
-                      {[
-                        { from: "🇺🇸 USD", to: "🇪🇺 EUR", rate: "0.9182" },
-                        { from: "🇺🇸 USD", to: "🇬🇧 GBP", rate: "0.7894" },
-                        { from: "🇺🇸 USD", to: "🇯🇵 JPY", rate: "149.32" },
-                      ].map((r) => (
-                        <div key={r.to} className="flex justify-between text-[10px] py-0.5">
-                          <span className="text-slate-500">{r.from} → {r.to}</span>
-                          <span className="font-bold text-slate-700">{r.rate}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="rounded-xl bg-white border border-slate-100 p-3 shadow-sm">
-                      <p className="text-[10px] font-bold text-slate-400 mb-2">NEXT TRIP</p>
-                      <p className="text-xs font-bold text-slate-800">🇯🇵 Tokyo Spring</p>
-                      <p className="text-[10px] text-slate-400 mt-0.5">Apr 12 — Apr 21</p>
-                      <div className="mt-2 h-1.5 w-full rounded-full bg-slate-100">
-                        <div className="h-1.5 w-2/3 rounded-full bg-[#2a5a40]" />
-                      </div>
-                      <p className="text-[10px] text-slate-400 mt-1">67% planned</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 animate-bounce">
+          <span className="text-white/50 text-xs font-medium tracking-widest uppercase">Scroll</span>
+          <div className="w-px h-8 bg-gradient-to-b from-white/40 to-transparent" />
         </div>
       </section>
 
@@ -385,10 +301,109 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ─── APP PREVIEW ─── */}
+      <section className="mx-auto max-w-7xl px-6 py-24">
+        <div className="text-center mb-12">
+          <span className="inline-flex items-center gap-2 rounded-full bg-[#EAF0EC] px-4 py-1.5 text-xs font-semibold text-[#2a5a40] mb-4">
+            See it in action
+          </span>
+          <h2 className="font-serif text-4xl font-bold text-slate-900">
+            Your travel workspace awaits.
+          </h2>
+        </div>
+
+        <div className="relative rounded-3xl border border-slate-200/80 bg-white shadow-2xl shadow-slate-200/60 overflow-hidden">
+          {/* Fake browser chrome */}
+          <div className="flex items-center gap-2 border-b border-slate-100 bg-slate-50 px-5 py-4">
+            <div className="flex gap-1.5">
+              <span className="h-3 w-3 rounded-full bg-red-400" />
+              <span className="h-3 w-3 rounded-full bg-amber-400" />
+              <span className="h-3 w-3 rounded-full bg-emerald-400" />
+            </div>
+            <div className="mx-auto flex items-center gap-2 rounded-lg bg-white border border-slate-200 px-4 py-1.5 text-xs text-slate-400">
+              <span>🔒</span>
+              horizon-travel.app/dashboard
+            </div>
+          </div>
+
+          {/* App Preview */}
+          <div className="grid md:grid-cols-[240px_1fr] min-h-[380px]">
+            {/* Sidebar */}
+            <div className="border-r border-slate-100 bg-white p-5 hidden md:block">
+              <div className="mb-6">
+                <p className="text-xs font-bold text-[#2a5a40] mb-1">Horizon Travel</p>
+                <p className="text-[10px] text-slate-400 uppercase tracking-widest">Global Explorer</p>
+              </div>
+              {[
+                { icon: "🏠", label: "Home", active: true },
+                { icon: "✈️", label: "Trips", active: false },
+                { icon: "💰", label: "Budget", active: false },
+                { icon: "💱", label: "Currency", active: false },
+                { icon: "❤️", label: "Wishlist", active: false },
+              ].map((item) => (
+                <div
+                  key={item.label}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2.5 mb-1 text-xs font-medium ${
+                    item.active ? "bg-[#EAF0EC] text-[#2a5a40]" : "text-slate-500"
+                  }`}
+                >
+                  <span>{item.icon}</span>
+                  {item.label}
+                </div>
+              ))}
+            </div>
+
+            {/* Dashboard preview */}
+            <div className="bg-[#f9f9f7] p-6">
+              <div className="mb-5 rounded-2xl bg-gradient-to-r from-[#2a5a40] to-[#3d7a58] p-5 text-white">
+                <p className="text-xs text-green-200 mb-1">Welcome back</p>
+                <p className="text-lg font-bold">Ready to explore? ✈️</p>
+                <p className="text-xs text-green-100 mt-1">3 upcoming trips planned</p>
+              </div>
+              <div className="grid grid-cols-3 gap-3 mb-4">
+                {[
+                  { label: "Total Trips", val: "8", color: "text-[#2a5a40]" },
+                  { label: "Upcoming", val: "3", color: "text-blue-600" },
+                  { label: "Budget", val: "$4,200", color: "text-violet-600" },
+                ].map((s) => (
+                  <div key={s.label} className="rounded-xl bg-white border border-slate-100 p-3 shadow-sm">
+                    <p className="text-[10px] text-slate-400">{s.label}</p>
+                    <p className={`text-base font-bold mt-1 ${s.color}`}>{s.val}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-xl bg-white border border-slate-100 p-3 shadow-sm">
+                  <p className="text-[10px] font-bold text-slate-400 mb-2">LIVE RATES</p>
+                  {[
+                    { from: "🇺🇸 USD", to: "🇪🇺 EUR", rate: "0.9182" },
+                    { from: "🇺🇸 USD", to: "🇬🇧 GBP", rate: "0.7894" },
+                    { from: "🇺🇸 USD", to: "🇯🇵 JPY", rate: "149.32" },
+                  ].map((r) => (
+                    <div key={r.to} className="flex justify-between text-[10px] py-0.5">
+                      <span className="text-slate-500">{r.from} → {r.to}</span>
+                      <span className="font-bold text-slate-700">{r.rate}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="rounded-xl bg-white border border-slate-100 p-3 shadow-sm">
+                  <p className="text-[10px] font-bold text-slate-400 mb-2">NEXT TRIP</p>
+                  <p className="text-xs font-bold text-slate-800">🇯🇵 Tokyo Spring</p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">Apr 12 — Apr 21</p>
+                  <div className="mt-2 h-1.5 w-full rounded-full bg-slate-100">
+                    <div className="h-1.5 w-2/3 rounded-full bg-[#2a5a40]" />
+                  </div>
+                  <p className="text-[10px] text-slate-400 mt-1">67% planned</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ─── CTA SECTION ─── */}
-      <section id="about" className="mx-auto max-w-7xl px-6 py-24">
+      <section id="about" className="mx-auto max-w-7xl px-6 pb-24">
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#2a5a40] via-[#3d7a58] to-[#2a5a40] p-12 md:p-20 text-center shadow-2xl shadow-[#2a5a40]/20">
-          {/* Decorative blobs */}
           <div aria-hidden className="absolute -top-16 -right-16 h-64 w-64 rounded-full bg-white/5 blur-2xl" />
           <div aria-hidden className="absolute -bottom-16 -left-16 h-64 w-64 rounded-full bg-white/5 blur-2xl" />
 
@@ -437,9 +452,10 @@ export default function HomePage() {
             © 2026 Horizon Travel. Built with ❤️ for explorers.
           </p>
           <div className="flex gap-6 text-sm text-slate-400">
+            <Link href="/explore" className="hover:text-[#2a5a40] transition-colors">Explore</Link>
+            <Link href="/contact" className="hover:text-[#2a5a40] transition-colors">Contact</Link>
             <Link href="/auth/login" className="hover:text-[#2a5a40] transition-colors">Sign In</Link>
             <Link href="/auth/register" className="hover:text-[#2a5a40] transition-colors">Register</Link>
-            <Link href="/dashboard" className="hover:text-[#2a5a40] transition-colors">Dashboard</Link>
           </div>
         </div>
       </footer>

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Compass, Users } from "lucide-react";
+import { LayoutDashboard, Compass, Users, MapPin, BookOpen, MessageSquare, Activity } from "lucide-react";
 
 export function AdminTabs() {
   const pathname = usePathname();
@@ -11,6 +11,10 @@ export function AdminTabs() {
     { href: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
     { href: "/admin/users", label: "Users", icon: Users },
     { href: "/admin/trips", label: "Trips", icon: Compass },
+    { href: "/admin/destinations", label: "Destinations", icon: MapPin },
+    { href: "/admin/stories", label: "Stories", icon: BookOpen },
+    { href: "/admin/feedback", label: "Feedback", icon: MessageSquare },
+    { href: "/admin/monitoring", label: "Health Logs", icon: Activity },
   ];
 
   return (

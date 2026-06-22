@@ -105,9 +105,40 @@ model Story {
   location  String?
   coverUrl  String?
   date      DateTime @default(now())
+  status    String   @default("PENDING") // PENDING, APPROVED, REJECTED
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
+
+model Destination {
+  id          String   @id @default(cuid())
+  name        String
+  description String   @db.Text
+  image       String   @default("")
+  category    String   // e.g. Adventure, Beach, Historical, Nature, Cultural
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Feedback {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String
+  message   String   @db.Text
+  category  String   @default("FEEDBACK") // FEEDBACK, SUPPORT, CONTACT
+  status    String   @default("NEW")      // NEW, IN_PROGRESS, RESOLVED
+  createdAt DateTime @default(now())
+}
+
+model SystemLog {
+  id        String   @id @default(cuid())
+  level     String   // INFO, WARN, ERROR
+  message   String   @db.Text
+  category  String   // API, DATABASE, AI, AUTH
+  timestamp DateTime @default(now())
+}
+
 
