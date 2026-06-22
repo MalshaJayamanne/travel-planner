@@ -1,10 +1,28 @@
 import { withAuth } from "next-auth/middleware";
+import { NextResponse } from "next/server";
 
-export default withAuth({
-  pages: {
-    signIn: "/auth",
+export default withAuth(
+  function proxy(req) {
+    const token = req.nextauth.token;
+    const isApiRoute = req.nextUrl.pathname.startsWith("/api/admin");
+    const isAdminRoute = req.nextUrl.pathname.startsWith("/admin");
+
+    if ((isAdminRoute || isApiRoute) && token?.role !== "ADMIN") {
+      if (isApiRoute) {
+        return new NextResponse(
+          JSON.stringify({ error: "Forbidden. Admin access required." }),
+          { status: 403, headers: { "content-type": "application/json" } }
+        );
+      }
+      return NextResponse.redirect(new URL("/dashboard", req.url));
+    }
   },
-});
+  {
+    pages: {
+      signIn: "/auth",
+    },
+  }
+);
 
 export const config = {
   matcher: [
@@ -19,5 +37,8 @@ export const config = {
     "/profile/:path*",
     "/explore/:path*",
     "/guides/:path*",
+    "/admin/:path*",
+    "/api/admin/:path*",
   ],
 };
+

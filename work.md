@@ -88,3 +88,85 @@
 - [x] Setup guide (`.env.example` updated with all vars including Cloudinary)
 - [x] Deployment assistance (next.config.ts updated with image domains)
 - [x] Final QA testing (build config verified, gallery + stories end-to-end)
+
+## Week 5 — Administration & System Management
+
+### Developer 1 (Main)
+
+#### Admin Dashboard Development
+- [ ] Admin Authentication & Authorization
+  - [ ] Implement Admin role management
+  - [ ] Create role-based access control (RBAC)
+  - [ ] Restrict admin routes
+  - [ ] Secure admin APIs
+- [ ] Admin Dashboard UI
+  - [ ] Design admin dashboard layout
+  - [ ] Admin sidebar navigation
+  - [ ] Dashboard analytics cards
+  - [ ] Overview statistics page
+- [ ] User Management Module
+  - [ ] View all users
+  - [ ] Search users
+  - [ ] Disable/enable accounts
+  - [ ] Delete user accounts
+  - [ ] View user activity
+- [ ] Trip Management Module
+  - [ ] View all trips
+  - [ ] View generated itineraries
+  - [ ] Delete inappropriate trips
+  - [ ] Monitor trip creation statistics
+- [ ] Analytics Dashboard
+  - [ ] Total users
+  - [ ] Active users
+  - [ ] Total trips created
+  - [ ] Most popular destinations
+  - [ ] AI usage statistics
+
+### Developer 2 (Support)
+
+#### Content Management & Monitoring
+- [ ] Destination Management
+  - [ ] Add destinations
+  - [ ] Edit destination information
+  - [ ] Delete destinations
+  - [ ] Manage destination categories
+- [ ] Travel Stories Moderation
+  - [ ] View submitted stories
+  - [ ] Approve stories
+  - [ ] Reject inappropriate content
+  - [ ] Delete reported content
+- [ ] System Monitoring
+  - [ ] API health dashboard
+  - [ ] Error logging page
+  - [ ] AI request monitoring
+  - [ ] Database status indicators
+- [ ] Feedback Management
+  - [ ] View user feedback
+  - [ ] Manage contact requests
+  - [ ] Export feedback reports
+- [ ] Support UI & Integration
+  - [ ] Admin tables
+  - [ ] Search filters
+  - [ ] Pagination
+  - [ ] Responsive admin interface
+
+## 🏆 New System Roles
+
+### Traveler (Default User)
+- Register/Login
+- Create trips
+- Generate AI itineraries
+- Manage wishlist
+- Save trips
+- Post travel stories
+
+### Administrator
+- Manage users
+- Manage trips
+- Manage destinations
+- Moderate travel stories
+- View analytics
+- Monitor AI usage
+- Review feedback
+- System configuration
+

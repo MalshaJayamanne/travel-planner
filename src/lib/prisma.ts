@@ -28,6 +28,7 @@ export async function createUserRecord(input: {
   email: string;
   passwordHash: string;
   image?: string | null;
+  role?: string;
 }) {
   return prisma.user.create({
     data: input,
@@ -35,6 +36,8 @@ export async function createUserRecord(input: {
       id: true,
       name: true,
       email: true,
+      role: true,
+      isActive: true,
     },
   });
 }
