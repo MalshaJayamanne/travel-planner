@@ -154,30 +154,17 @@ export default function HomePage() {
 
         {/* Hero Content */}
         <div className="relative z-10 mx-auto max-w-5xl px-6 pt-24 pb-20 text-center">
-          {/* Badge */}
-          <div className="flex justify-center mb-8">
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 backdrop-blur-sm px-4 py-1.5 text-xs font-semibold text-white/90">
-              <Sparkles className="h-3.5 w-3.5 text-emerald-400" />
-              AI-Powered Travel Planning · Now Live
-            </span>
-          </div>
 
           {/* Headline */}
           <h1 className="font-serif text-5xl font-bold leading-[1.1] tracking-tight text-white sm:text-6xl md:text-7xl drop-shadow-xl">
             Your entire trip,{" "}
-            <span className="relative inline-block">
-              <span className="relative z-10 text-emerald-400">beautifully</span>
-              <span
-                aria-hidden
-                className="absolute bottom-1 left-0 h-3 w-full -rotate-1 rounded-sm bg-emerald-500/30"
-              />
-            </span>{" "}
+            <span className="text-emerald-400">intelligently</span>{" "}
             planned.
           </h1>
 
           <p className="mt-6 text-lg leading-8 text-white/75 max-w-2xl mx-auto drop-shadow">
             Plan destinations, track budgets, convert currencies, and generate
-            AI-powered itineraries — all in one beautifully crafted travel workspace.
+            AI-powered itineraries - all in one beautifully crafted travel workspace.
           </p>
 
           {/* CTAs */}
