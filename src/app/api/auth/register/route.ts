@@ -1,5 +1,5 @@
 import { hashPassword } from "@/lib/password";
-import { createUserRecord, findUserByEmail } from "@/lib/prisma";
+import { createUserRecord, findUserByEmail, prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -32,10 +32,15 @@ export async function POST(req: Request) {
       );
     }
 
+    // Assign ADMIN role if it's the first registered user
+    const userCount = await prisma.user.count();
+    const role = userCount === 0 ? "ADMIN" : "TRAVELER";
+
     const user = await createUserRecord({
       name,
       email,
       passwordHash: hashPassword(password),
+      role,
     });
 
     return NextResponse.json({ user }, { status: 201 });

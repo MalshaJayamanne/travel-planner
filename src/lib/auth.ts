@@ -42,11 +42,17 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
+        if (user.isActive === false) {
+          throw new Error("Your account has been disabled. Please contact support.");
+        }
+
         return {
           id: user.id,
           name: user.name,
           email: user.email,
           image: user.image,
+          role: user.role,
+          isActive: user.isActive,
         };
       },
     }),
@@ -55,22 +61,26 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id;
+        token.role = user.role;
+        token.isActive = user.isActive;
       }
       
       if (trigger === "update" && session) {
         if (session.name) token.name = session.name;
         if (session.image !== undefined) token.picture = session.image;
+        if (session.role) token.role = session.role;
+        if (session.isActive !== undefined) token.isActive = session.isActive;
       }
 
       return token;
     },
     async session({ session, token }) {
-      if (session.user && token.id) {
-        session.user.id = token.id as string;
-      }
       if (session.user) {
+        if (token.id) session.user.id = token.id as string;
         session.user.name = token.name as string | null | undefined;
         session.user.image = token.picture as string | null | undefined;
+        session.user.role = (token.role as string) || "TRAVELER";
+        session.user.isActive = token.isActive !== false;
       }
 
       return session;

@@ -18,6 +18,7 @@ A full-stack AI-powered travel planning application built with **Next.js 16**, *
 | 🗺️ **Interactive Map** | Route and destination visualization with Leaflet |
 | ❤️ **Wishlist** | Save dream destinations with priority levels |
 | 👤 **Profile Manager** | User profile with avatar upload support |
+| 👑 **Admin Panel** | Centralized dashboard for user administration, trip management, destination settings, story moderation, system health monitoring, and analytics |
 
 ---
 
@@ -171,12 +172,30 @@ prisma/
 
 ---
 
+## 🏆 System Roles
+
+### 👤 Traveler (Default User)
+- **Authentication**: Register, login, and manage profile
+- **Trips**: Create and manage trips, view itineraries
+- **AI Integration**: Generate AI itineraries based on preferences
+- **Wishlist & Savings**: Save trips and manage dream destinations
+- **Community**: Post and share travel stories
+
+### 👑 Administrator
+- **User Management**: View, search, enable/disable, and delete user accounts
+- **Trip Management**: View all trips, inspect AI itineraries, delete inappropriate content
+- **Content Moderation**: Manage destination database and categories; moderate travel stories
+- **System Monitoring**: Access API health, error logs, AI request usage, and database status
+- **Feedback & Support**: View user feedback, manage contact requests, and export reports
+
+---
+
 ## 👥 Team
 
 | Developer | Role | Weeks |
 |---|---|---|
-| Developer 1 (Main) | Frontend, AI, Maps, Gallery, Stories, Deployment | Weeks 1–4 |
-| Developer 2 (Support) | Backend, Auth, Wishlist, Currency, QA, Docs | Weeks 1–4 |
+| Developer 1 (Main) | Frontend, AI, Maps, Gallery, Stories, Deployment, Admin Dashboard | Weeks 1–5 |
+| Developer 2 (Support) | Backend, Auth, Wishlist, Currency, QA, Docs, Content Moderation & Monitoring | Weeks 1–5 |
 
 ---
 

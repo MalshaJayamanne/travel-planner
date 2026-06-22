@@ -4,7 +4,7 @@ import { SignOutButton } from "@/components/sign-out-button";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { Bell, Camera, Compass, Home, LogOut, Settings, User, Wallet, Heart, DollarSign } from "lucide-react";
+import { Bell, Camera, Compass, Home, LogOut, Settings, User, Wallet, Heart, DollarSign, Shield } from "lucide-react";
 import type { ReactNode } from "react";
 
 const navItems = [
@@ -54,12 +54,16 @@ export function AppShell({ children, userEmail, backLink }: AppShellProps) {
         </div>
 
         <div className="px-8 mb-8">
-          <h2 className="font-serif text-lg font-bold text-slate-800">Traveler</h2>
-          <p className="text-xs text-slate-500 uppercase tracking-widest mt-1">Global Explorer</p>
+          <h2 className="font-serif text-lg font-bold text-slate-800">
+            {session?.user?.role === "ADMIN" ? "Admin" : "Traveler"}
+          </h2>
+          <p className="text-xs text-slate-500 uppercase tracking-widest mt-1">
+            {session?.user?.role === "ADMIN" ? "System Manager" : "Global Explorer"}
+          </p>
         </div>
 
         <nav className="flex-1 px-4 space-y-1">
-          {navItems.map((item) => {
+          {(session?.user?.role === "ADMIN" ? [...navItems, { href: "/admin", label: "Admin Panel", icon: Shield }] : navItems).map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
             return (
               <Link
