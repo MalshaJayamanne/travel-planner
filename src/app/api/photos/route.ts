@@ -63,13 +63,13 @@ export async function POST(req: Request) {
 
   try {
     const formData = await req.formData();
-    const file = formData.get("file") as File | null;
+    const file = formData.get("file");
     const caption = formData.get("caption") as string | null;
     const location = formData.get("location") as string | null;
     const tripId = formData.get("tripId") as string | null;
 
-    if (!file) {
-      return NextResponse.json({ error: "No file provided" }, { status: 400 });
+    if (!file || typeof file === "string" || !(file instanceof Blob)) {
+      return NextResponse.json({ error: "No file provided or invalid file format" }, { status: 400 });
     }
 
     const bytes = await file.arrayBuffer();
@@ -94,7 +94,8 @@ export async function POST(req: Request) {
       await fs.mkdir(uploadDir, { recursive: true });
 
       const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-      const fileExtension = path.extname(file.name) || ".jpg";
+      const originalName = (file as any).name || "photo.jpg";
+      const fileExtension = path.extname(originalName) || ".jpg";
       const filename = `photo-${uniqueSuffix}${fileExtension}`;
       const filePath = path.join(uploadDir, filename);
 
@@ -115,9 +116,9 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json(photo, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Failed to upload photo:", error);
-    return NextResponse.json({ error: "Failed to upload photo" }, { status: 500 });
+    return NextResponse.json({ error: error?.message || "Failed to upload photo" }, { status: 500 });
   }
 }
 

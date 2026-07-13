@@ -41,13 +41,7 @@ export default function AdminDestinationsPage() {
   });
   const [formError, setFormError] = useState("");
   const [submitting, setSubmitting] = useState(false);
-
-  // Delete states
   const [deleteConfirm, setDeleteConfirm] = useState<Destination | null>(null);
-
-  useEffect(() => {
-    fetchDestinations();
-  }, []);
 
   const fetchDestinations = async () => {
     try {
@@ -65,6 +59,10 @@ export default function AdminDestinationsPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchDestinations();
+  }, []);
 
   const handleOpenAddModal = () => {
     setEditingDest(null);

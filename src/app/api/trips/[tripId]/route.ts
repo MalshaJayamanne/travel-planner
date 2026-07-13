@@ -8,6 +8,8 @@ const tripSchema = z
   .object({
     title: z.string().trim().min(2).max(120).optional(),
     destination: z.string().trim().min(2).max(120).optional(),
+    country: z.string().trim().min(2).max(120).optional(),
+    city: z.string().trim().min(2).max(120).optional(),
     startDate: z.string().datetime().optional(),
     endDate: z.string().datetime().optional(),
     budget: z.coerce.number().nonnegative().optional(),
@@ -22,8 +24,9 @@ export async function GET(_req: Request, { params }: { params: Promise<{ tripId:
   }
 
   const { tripId } = await params;
-  const trips = await prisma.trip.findMany({ where: { userId: session.user.id } });
-  const trip = trips.find((item: { id: string }) => item.id === tripId);
+  const trip = await prisma.trip.findFirst({
+    where: { id: tripId, userId: session.user.id },
+  });
 
   if (!trip) {
     return NextResponse.json({ error: "Trip not found" }, { status: 404 });
@@ -40,6 +43,15 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ tripId
   }
 
   const { tripId } = await params;
+
+  // Verify ownership before update
+  const existing = await prisma.trip.findFirst({
+    where: { id: tripId, userId: session.user.id },
+  });
+  if (!existing) {
+    return NextResponse.json({ error: "Trip not found" }, { status: 404 });
+  }
+
   const parsed = tripSchema.safeParse(await req.json());
 
   if (!parsed.success) {
@@ -51,6 +63,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ tripId
     data: {
       ...(parsed.data.title ? { title: parsed.data.title } : {}),
       ...(parsed.data.destination ? { destination: parsed.data.destination } : {}),
+      ...(parsed.data.country ? { country: parsed.data.country } : {}),
+      ...(parsed.data.city ? { city: parsed.data.city } : {}),
       ...(parsed.data.startDate ? { startDate: new Date(parsed.data.startDate) } : {}),
       ...(parsed.data.endDate ? { endDate: new Date(parsed.data.endDate) } : {}),
       ...(parsed.data.budget !== undefined ? { budget: parsed.data.budget } : {}),
@@ -68,6 +82,15 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ trip
   }
 
   const { tripId } = await params;
+
+  // Verify ownership before delete
+  const existing = await prisma.trip.findFirst({
+    where: { id: tripId, userId: session.user.id },
+  });
+  if (!existing) {
+    return NextResponse.json({ error: "Trip not found" }, { status: 404 });
+  }
+
   const deletedTrip = await prisma.trip.delete({ where: { id: tripId } });
 
   return NextResponse.json(deletedTrip);

@@ -73,7 +73,7 @@ const features = [
 const destinations = [
   { name: "Tokyo", country: "Japan", emoji: "🇯🇵", tag: "Cultural" },
   { name: "Santorini", country: "Greece", emoji: "🇬🇷", tag: "Romantic" },
-  { name: "Bali", country: "Indonesia", emoji: "🇮🇩", tag: "Tropical" },
+  { name: "Galle", country: "Sri Lanka", emoji: "🇱🇰", tag: "Tropical" },
   { name: "Paris", country: "France", emoji: "🇫🇷", tag: "Classic" },
   { name: "Safari", country: "Kenya", emoji: "🇰🇪", tag: "Adventure" },
   { name: "New York", country: "USA", emoji: "🇺🇸", tag: "Urban" },
@@ -169,6 +169,7 @@ export default function HomePage() {
 
           {/* CTAs */}
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+            
             <Link
               href="/auth/register"
               id="hero-cta-primary"
@@ -351,7 +352,7 @@ export default function HomePage() {
                 {[
                   { label: "Total Trips", val: "8", color: "text-[#2a5a40]" },
                   { label: "Upcoming", val: "3", color: "text-blue-600" },
-                  { label: "Budget", val: "$4,200", color: "text-violet-600" },
+                  { label: "Budget", val: "Rs. 4,200", color: "text-violet-600" },
                 ].map((s) => (
                   <div key={s.label} className="rounded-xl bg-white border border-slate-100 p-3 shadow-sm">
                     <p className="text-[10px] text-slate-400">{s.label}</p>

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma as db } from "@/lib/prisma";
-import { generateItinerary } from "@/services/ai";
+import { generateItinerary, MustIncludePlace } from "@/services/ai";
 
 export async function POST(
   req: Request,
@@ -17,7 +17,19 @@ export async function POST(
 
     const { tripId } = await params;
 
+    // Parse optional body for must-include places
+    let mustIncludePlaces: MustIncludePlace[] | undefined;
+    try {
+      const body = await req.json();
+      if (body?.mustIncludePlaces && Array.isArray(body.mustIncludePlaces)) {
+        mustIncludePlaces = body.mustIncludePlaces as MustIncludePlace[];
+      }
+    } catch {
+      // No body or invalid JSON — that's fine
+    }
+
     // Fetch the trip
+
     const trip = await db.trip.findUnique({
       where: {
         id: tripId,
@@ -34,17 +46,20 @@ export async function POST(
       where: { userId: session.user.id },
     });
 
-    // Calculate days between start and end date
+    // Calculate trip duration in days (nights between startDate and endDate)
+    // e.g. July 13 → July 16 = 3 nights = 3 days of activities
     const start = new Date(trip.startDate);
     const end = new Date(trip.endDate);
-    const durationDays = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
+    const diffMs = end.getTime() - start.getTime();
+    const durationDays = Math.max(1, Math.round(diffMs / (1000 * 60 * 60 * 24)));
 
     // Generate itinerary via AI
     const itineraryData = await generateItinerary(
       trip.destination,
       durationDays,
       trip.budget,
-      preferences
+      preferences,
+      mustIncludePlaces
     );
 
     // Delete existing itinerary for this trip (replace it)
@@ -60,6 +75,21 @@ export async function POST(
             tripId: trip.id,
             day: item.day,
             activities: item.activities,
+            activityItems: {
+              create: item.activityItems ? item.activityItems.map((act, idx) => ({
+                title: act.title,
+                timeOfDay: act.timeOfDay,
+                order: idx,
+                status: act.status ?? "UPCOMING",
+                travelTime: act.travelTime ?? "",
+                suggestedAttraction: act.suggestedAttraction ?? "",
+                notes: act.notes ?? "",
+                locked: act.locked ?? false,
+              })) : [],
+            },
+          },
+          include: {
+            activityItems: true,
           },
         });
       })
@@ -68,8 +98,9 @@ export async function POST(
     return NextResponse.json({ success: true, itineraries: savedItineraries }, { status: 200 });
   } catch (error) {
     console.error("Error generating itinerary:", error);
+    const message = error instanceof Error ? error.message : "Internal Server Error";
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      { error: message },
       { status: 500 }
     );
   }
@@ -99,6 +130,11 @@ export async function GET(
 
     const itineraries = await db.itinerary.findMany({
       where: { tripId: trip.id },
+      include: {
+        activityItems: {
+          orderBy: { order: 'asc' }
+        }
+      },
       orderBy: { day: 'asc' },
     });
 

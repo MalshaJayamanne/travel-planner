@@ -114,7 +114,7 @@ export function ProfileManager({ stats }: ProfileManagerProps) {
           </div>
           <div>
             <p className="text-sm font-medium text-slate-500">Total Budget Tracked</p>
-            <p className="text-2xl font-bold text-slate-800">${stats.totalBudget.toLocaleString()}</p>
+            <p className="text-2xl font-bold text-slate-800">Rs. {stats.totalBudget.toLocaleString()}</p>
           </div>
         </div>
         <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm flex items-center gap-4">

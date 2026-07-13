@@ -7,6 +7,8 @@ import { z } from "zod";
 const tripSchema = z.object({
   title: z.string().trim().min(2).max(120),
   destination: z.string().trim().min(2).max(120),
+  country: z.string().trim().min(2).max(120).optional().default("Sri Lanka"),
+  city: z.string().trim().min(2).max(120).optional().default(""),
   startDate: z.string().datetime(),
   endDate: z.string().datetime(),
   budget: z.coerce.number().nonnegative(),
@@ -32,6 +34,8 @@ export async function POST(req: Request) {
     data: {
       title: parsed.data.title,
       destination: parsed.data.destination,
+      country: parsed.data.country || "Sri Lanka",
+      city: parsed.data.city || "",
       startDate: new Date(parsed.data.startDate),
       endDate: new Date(parsed.data.endDate),
       budget: parsed.data.budget,

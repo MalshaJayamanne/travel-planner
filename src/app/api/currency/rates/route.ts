@@ -3,7 +3,7 @@ import { fetchExchangeRates } from "@/services/currency";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
-  const base = searchParams.get("base") ?? "USD";
+  const base = searchParams.get("base") ?? "LKR";
 
   try {
     const rates = await fetchExchangeRates(base.toUpperCase());

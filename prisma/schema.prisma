@@ -37,14 +37,17 @@ model Wishlist {
 }
 
 model Trip {
-  id          String      @id @default(cuid())
-  title       String
-  destination String
-  startDate   DateTime
-  endDate     DateTime
-  budget      Float
-  userId      String
-  createdAt   DateTime    @default(now())
+  id            String      @id @default(cuid())
+  title         String
+  startLocation String      @default("")
+  country       String      @default("Sri Lanka")
+  city          String      @default("")
+  destination   String
+  startDate     DateTime
+  endDate       DateTime
+  budget        Float
+  userId        String
+  createdAt     DateTime    @default(now())
 
   user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   expenses    Expense[]
@@ -53,25 +56,45 @@ model Trip {
 }
 
 model Expense {
-  id        String   @id @default(cuid())
-  title     String
-  amount    Float
-  category  String
-  date      DateTime @default(now())
-  tripId    String
-  userId    String
+  id          String   @id @default(cuid())
+  title       String
+  amount      Float
+  category    String
+  subcategory String?
+  date        DateTime @default(now())
+  description String?
+  tripId      String
+  userId      String
 
-  trip      Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  trip        Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Itinerary {
-  id         String @id @default(cuid())
-  tripId     String
-  day        Int
-  activities String
+  id            String              @id @default(cuid())
+  tripId        String
+  day           Int
+  activities    String
+  activityItems ItineraryActivity[]
 
-  trip       Trip   @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  trip          Trip                @relation(fields: [tripId], references: [id], onDelete: Cascade)
+}
+
+model ItineraryActivity {
+  id                  String    @id @default(cuid())
+  itineraryId         String
+  title               String
+  timeOfDay           String    // Morning, Afternoon, Evening
+  status              String    @default("UPCOMING") // UPCOMING, ONGOING, COMPLETED
+  order               Int       @default(0)
+  travelTime          String?   @default("")
+  suggestedAttraction String?   @default("")
+  restaurant          String?   @default("")
+  accommodation       String?   @default("")
+  notes               String?   @default("")
+  locked              Boolean   @default(false)
+
+  itinerary           Itinerary @relation(fields: [itineraryId], references: [id], onDelete: Cascade)
 }
 
 model Preference {
@@ -98,18 +121,31 @@ model Photo {
 }
 
 model Story {
-  id        String   @id @default(cuid())
-  userId    String
-  title     String
-  content   String   @db.Text
-  location  String?
-  coverUrl  String?
-  date      DateTime @default(now())
-  status    String   @default("PENDING") // PENDING, APPROVED, REJECTED
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String       @id @default(cuid())
+  userId     String
+  title      String
+  content    String       @db.Text
+  location   String?
+  coverUrl   String?
+  date       DateTime     @default(now())
+  status     String       @default("PENDING") // PENDING, APPROVED, REJECTED
+  visibility String       @default("PUBLIC") // PUBLIC, PRIVATE
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  images    StoryImage[]
+}
+
+model StoryImage {
+  id        String   @id @default(cuid())
+  storyId   String
+  url       String
+  publicId  String?
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  story     Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
 }
 
 model Destination {
@@ -139,6 +175,16 @@ model SystemLog {
   message   String   @db.Text
   category  String   // API, DATABASE, AI, AUTH
   timestamp DateTime @default(now())
+}
+
+model Guide {
+  id        String   @id @default(cuid())
+  title     String
+  subtitle  String?
+  content   String   @db.Text
+  category  String   @default("General")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 

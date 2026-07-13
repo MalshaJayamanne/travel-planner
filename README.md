@@ -8,14 +8,17 @@ A full-stack AI-powered travel planning application built with **Next.js 16**, *
 
 | Module | Description |
 |---|---|
-| 🗺️ **Trip Planner** | Create, manage, and track trips with destinations, budgets & dates |
-| 🤖 **AI Itinerary** | Gemini-powered day-by-day itinerary generation |
-| 📸 **Photo Gallery** | Upload & organize travel photos via Cloudinary |
-| 📖 **Travel Stories** | Write and publish user-generated travel stories |
-| 💰 **Budget Tracker** | Expense tracking with category breakdown charts |
-| 💱 **Currency Converter** | Live exchange rates via Frankfurter ECB API |
+| 🗺️ **Trip Planner** | Create, manage, and track trips with Country, City, Destination fields & budget |
+| 🤖 **AI-Owned Itinerary** | Gemini-powered itinerary generation with Morning/Afternoon/Evening activity breakdown and **AI Day Summaries** |
+| 📍 **Itinerary Place Injection** | Users can pin custom locations to a specific day, triggering AI to regenerate the itinerary with those constraints |
+| ⚠️ **Regenerate confirmation** | Avoid accidental progress wipes via confirmation prompts on regenerations |
+| ✅ **Trip Progress Tracker** | 0–100% progress bar, per-activity status toggling (Upcoming → Ongoing → Completed) |
+| 💰 **Budget & Expense Tracker** | Full expense CRUD in LKR with granular categories/subcategories, inline-editable total budget (Enter key support), and live utilization metrics |
+| 📸 **Photo Gallery** | Upload & organize travel photos locally or via Cloudinary |
+| 📖 **Travel Stories** | Write and publish user-generated multi-image travel stories |
+| 💱 **Currency Converter** | Live exchange rates via Frankfurter ECB API (with LKR support) |
 | 🌤️ **Weather Widget** | Real-time weather for any destination |
-| 🗺️ **Interactive Map** | Route and destination visualization with Leaflet |
+| 🗺️ **Interactive Map** | Precision geocoding using Country + City + Place for accurate Leaflet maps |
 | ❤️ **Wishlist** | Save dream destinations with priority levels |
 | 👤 **Profile Manager** | User profile with avatar upload support |
 | 👑 **Admin Panel** | Centralized dashboard for user administration, trip management, destination settings, story moderation, system health monitoring, and analytics |
@@ -94,7 +97,7 @@ CLOUDINARY_API_SECRET=your_api_secret
 
 ```bash
 git add .
-git commit -m "feat: Week 4 — finalization & deployment"
+git commit -m "feat: Week 5 — trip tracking, budget management & Sri Lanka support"
 git push origin main
 ```
 
