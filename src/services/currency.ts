@@ -17,12 +17,14 @@ export type ConversionResult = {
   timestamp: number;
 };
 
-// Only currencies supported by the Frankfurter (ECB) API
+// Currencies supported by the Frankfurter (ECB) API
 // Full list: AUD BGN BRL CAD CHF CNY CZK DKK EUR GBP HKD HUF IDR ILS INR ISK JPY KRW MXN MYR NOK NZD PHP PLN RON SEK SGD THB TRY USD ZAR
+// LKR is handled via Open Exchange Rates fallback in the API route
 export const POPULAR_CURRENCIES = [
   { code: "USD", name: "US Dollar",          symbol: "$",    flag: "🇺🇸" },
   { code: "EUR", name: "Euro",               symbol: "€",    flag: "🇪🇺" },
   { code: "GBP", name: "British Pound",      symbol: "£",    flag: "🇬🇧" },
+  { code: "LKR", name: "Sri Lankan Rupee",   symbol: "Rs",   flag: "🇱🇰" },
   { code: "JPY", name: "Japanese Yen",       symbol: "¥",    flag: "🇯🇵" },
   { code: "AUD", name: "Australian Dollar",  symbol: "A$",   flag: "🇦🇺" },
   { code: "CAD", name: "Canadian Dollar",    symbol: "C$",   flag: "🇨🇦" },
@@ -57,10 +59,42 @@ export function getCurrencyInfo(code: string) {
  * Fetches all exchange rates for a given base currency.
  * Cached for 1 hour since rates update once per ECB business day.
  */
-export async function fetchExchangeRates(baseCurrency = "USD"): Promise<CurrencyRate | null> {
+export async function fetchExchangeRates(baseCurrency = "LKR"): Promise<CurrencyRate | null> {
   try {
+    const base = baseCurrency.toUpperCase();
+
+    if (base === "LKR") {
+      const [usdRatesResponse, lkrToUsdResponse] = await Promise.all([
+        fetch("https://api.frankfurter.app/latest?from=USD", { next: { revalidate: 3600 } }),
+        fetch("https://open.er-api.com/v6/latest/USD", { next: { revalidate: 3600 } }),
+      ]);
+
+      if (!usdRatesResponse.ok) {
+        throw new Error(`Frankfurter API error: ${usdRatesResponse.status}`);
+      }
+
+      if (!lkrToUsdResponse.ok) {
+        throw new Error(`Open Exchange API error: ${lkrToUsdResponse.status}`);
+      }
+
+      const usdRatesData = await usdRatesResponse.json() as { rates: Record<string, number> };
+      const lkrData = await lkrToUsdResponse.json() as { rates: Record<string, number> };
+      const lkrPerUsd = lkrData.rates?.LKR ?? 310;
+      const usdToLkr = 1 / lkrPerUsd;
+
+      const rates: Record<string, number> = {
+        LKR: 1,
+        USD: usdToLkr,
+        ...Object.fromEntries(
+          Object.entries(usdRatesData.rates).map(([currency, value]) => [currency, usdToLkr * value])
+        ),
+      };
+
+      return { base: "LKR", rates, timestamp: Date.now() };
+    }
+
     const response = await fetch(
-      `https://api.frankfurter.app/latest?from=${baseCurrency}`,
+      `https://api.frankfurter.app/latest?from=${base}`,
       { next: { revalidate: 3600 } }
     );
 
@@ -71,9 +105,9 @@ export async function fetchExchangeRates(baseCurrency = "USD"): Promise<Currency
     const data = await response.json() as { base: string; date: string; rates: Record<string, number> };
 
     // Include the base currency itself at rate 1
-    const rates: Record<string, number> = { [baseCurrency]: 1, ...data.rates };
+    const rates: Record<string, number> = { [base]: 1, ...data.rates };
 
-    return { base: baseCurrency, rates, timestamp: Date.now() };
+    return { base, rates, timestamp: Date.now() };
   } catch (error) {
     console.error("Failed to fetch exchange rates:", error);
     return null;
@@ -85,6 +119,21 @@ export async function fetchExchangeRates(baseCurrency = "USD"): Promise<Currency
  * Uses cache: 'no-store' so every call gets fresh data — critical for
  * accurate results when the user changes amount/pair rapidly.
  */
+// Currencies not supported by Frankfurter — handled via USD bridge with live rate
+// LKR rate is fetched from exchangerate-api (free, no key needed for basic rates)
+const LKR_UNSUPPORTED_BY_FRANKFURTER = ["LKR"];
+
+async function getLKRtoUSD(): Promise<number> {
+  try {
+    const res = await fetch("https://open.er-api.com/v6/latest/USD", { next: { revalidate: 3600 } });
+    if (res.ok) {
+      const data = await res.json() as { rates: Record<string, number> };
+      return data.rates["LKR"] || 310; // fallback ~310 LKR/USD
+    }
+  } catch { /* ignore */ }
+  return 310; // safe fallback
+}
+
 export async function convertCurrency(
   amount: number,
   from: string,
@@ -95,12 +144,53 @@ export async function convertCurrency(
     return { from, to, amount, converted: amount, rate: 1, timestamp: Date.now() };
   }
 
+  const fromIsLKR = LKR_UNSUPPORTED_BY_FRANKFURTER.includes(from);
+  const toIsLKR = LKR_UNSUPPORTED_BY_FRANKFURTER.includes(to);
+
+  // LKR proxy conversion via USD bridge
+  if (fromIsLKR || toIsLKR) {
+    const lkrPerUsd = await getLKRtoUSD();
+
+    if (from === "LKR" && to === "USD") {
+      const rate = 1 / lkrPerUsd;
+      return { from, to, amount, converted: Math.round(amount * rate * 1e6) / 1e6, rate, timestamp: Date.now() };
+    }
+    if (from === "USD" && to === "LKR") {
+      return { from, to, amount, converted: Math.round(amount * lkrPerUsd * 1e6) / 1e6, rate: lkrPerUsd, timestamp: Date.now() };
+    }
+
+    // Any other pair involving LKR: convert via USD bridge
+    if (from === "LKR") {
+      // LKR → USD → target
+      const amountInUSD = amount / lkrPerUsd;
+      const bridgeRes = await fetch(`https://api.frankfurter.app/latest?from=USD&to=${to}`, { cache: "no-store" });
+      if (!bridgeRes.ok) return null;
+      const bridgeData = await bridgeRes.json() as { rates: Record<string, number> };
+      const usdToTarget = bridgeData.rates[to];
+      if (!usdToTarget) return null;
+      const converted = Math.round(amountInUSD * usdToTarget * 1e6) / 1e6;
+      const rate = converted / amount;
+      return { from, to, amount, converted, rate, timestamp: Date.now() };
+    }
+
+    if (to === "LKR") {
+      // source → USD → LKR
+      const bridgeRes = await fetch(`https://api.frankfurter.app/latest?from=${from}&to=USD`, { cache: "no-store" });
+      if (!bridgeRes.ok) return null;
+      const bridgeData = await bridgeRes.json() as { rates: Record<string, number> };
+      const sourceToUsd = bridgeData.rates["USD"];
+      if (!sourceToUsd) return null;
+      const amountInUSD = amount * sourceToUsd;
+      const converted = Math.round(amountInUSD * lkrPerUsd * 1e6) / 1e6;
+      const rate = converted / amount;
+      return { from, to, amount, converted, rate, timestamp: Date.now() };
+    }
+  }
+
   try {
-    // Fetch base rate only (amount=1) so we can calculate any amount client-side
-    // This avoids cache misses for every unique amount value
     const response = await fetch(
       `https://api.frankfurter.app/latest?from=${from}&to=${to}`,
-      { cache: "no-store" } // Always fresh — no stale conversion results
+      { cache: "no-store" }
     );
 
     if (!response.ok) {
@@ -115,9 +205,8 @@ export async function convertCurrency(
       throw new Error(`No rate found for ${from} → ${to}`);
     }
 
-    // data.rates[to] = rate for 1 unit of `from` → multiply by requested amount
     const rate = data.rates[to] as number;
-    const converted = Math.round(amount * rate * 1e6) / 1e6; // 6 dp precision
+    const converted = Math.round(amount * rate * 1e6) / 1e6;
 
     return { from, to, amount, converted, rate, timestamp: Date.now() };
   } catch (error) {
@@ -125,3 +214,4 @@ export async function convertCurrency(
     return null;
   }
 }
+

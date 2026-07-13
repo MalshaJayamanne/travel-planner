@@ -23,7 +23,15 @@ function MapUpdater({ center }: { center: [number, number] }) {
   return null;
 }
 
-export default function MapView({ destination }: { destination: string }) {
+export default function MapView({
+  destination,
+  city = "",
+  country = "",
+}: {
+  destination: string;
+  city?: string;
+  country?: string;
+}) {
   const [coords, setCoords] = useState<[number, number] | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -32,11 +40,23 @@ export default function MapView({ destination }: { destination: string }) {
       if (!destination) return;
       try {
         setLoading(true);
+        // Combine fields for highly accurate map search query
+        const query = [destination, city, country].filter(Boolean).join(", ");
         // Using openstreetmap nominatim for free geocoding
-        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(destination)}`);
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
         const data = await res.json();
         if (data && data.length > 0) {
           setCoords([parseFloat(data[0].lat), parseFloat(data[0].lon)]);
+        } else {
+          // Fallback to searching just the city/country if full name doesn't resolve
+          const fallbackQuery = [city, country].filter(Boolean).join(", ");
+          if (fallbackQuery && fallbackQuery !== query) {
+            const fallbackRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fallbackQuery)}`);
+            const fallbackData = await fallbackRes.json();
+            if (fallbackData && fallbackData.length > 0) {
+              setCoords([parseFloat(fallbackData[0].lat), parseFloat(fallbackData[0].lon)]);
+            }
+          }
         }
       } catch (err) {
         console.error("Failed to geocode destination:", err);
@@ -45,7 +65,7 @@ export default function MapView({ destination }: { destination: string }) {
       }
     }
     void geocode();
-  }, [destination]);
+  }, [destination, city, country]);
 
   if (loading) {
     return (
@@ -66,7 +86,7 @@ export default function MapView({ destination }: { destination: string }) {
   return (
     <div className="h-80 w-full overflow-hidden rounded-xl border border-slate-200 shadow-sm relative z-0">
       <MapContainer 
-        center={coords} 
+         center={coords} 
         zoom={12} 
         scrollWheelZoom={false} 
         style={{ height: "100%", width: "100%" }}
@@ -77,7 +97,7 @@ export default function MapView({ destination }: { destination: string }) {
         />
         <MapUpdater center={coords} />
         <Marker position={coords} icon={icon}>
-          <Popup>{destination}</Popup>
+          <Popup>{[destination, city, country].filter(Boolean).join(", ")}</Popup>
         </Marker>
       </MapContainer>
     </div>

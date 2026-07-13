@@ -25,20 +25,42 @@ export async function GET(req: Request) {
       ];
     }
 
-    const stories = await prisma.story.findMany({
-      where: whereClause,
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            image: true,
+    let stories;
+    try {
+      stories = await prisma.story.findMany({
+        where: whereClause,
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              image: true,
+            },
+          },
+          images: {
+            orderBy: { order: "asc" },
           },
         },
-      },
-      orderBy: { createdAt: "desc" },
-    });
+        orderBy: { createdAt: "desc" },
+      });
+    } catch {
+      // Fallback if StoryImage does not exist yet
+      stories = await prisma.story.findMany({
+        where: whereClause,
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              image: true,
+            },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+      });
+    }
 
     return NextResponse.json({ stories });
   } catch (error) {

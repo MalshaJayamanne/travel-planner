@@ -1,0 +1,365 @@
+"use client";
+
+import { useState, useRef } from "react";
+import {
+  Sparkles,
+  MapPin,
+  Clock,
+  CheckCircle2,
+  Circle,
+  Plus,
+  Loader2,
+  Sunrise,
+  Sun,
+  Sunset,
+  ChevronUp,
+  Info,
+} from "lucide-react";
+
+type TimeSlot = "Morning" | "Afternoon" | "Evening";
+
+type Activity = {
+  id: string;
+  title: string;
+  timeOfDay: TimeSlot;
+  travelTime?: string;
+  suggestedAttraction?: string;
+  notes?: string;
+  status?: string;
+};
+
+type DayPlan = {
+  id: string;
+  day: number;
+  summary?: string;
+  activities: Activity[];
+};
+
+type AddPlaceEntry = {
+  place: string;
+  preferredTime: TimeSlot;
+};
+
+const TIME_ICONS: Record<TimeSlot, React.ReactNode> = {
+  Morning: <Sunrise className="h-3.5 w-3.5" />,
+  Afternoon: <Sun className="h-3.5 w-3.5" />,
+  Evening: <Sunset className="h-3.5 w-3.5" />,
+};
+
+const TIME_COLORS: Record<TimeSlot, string> = {
+  Morning: "bg-amber-50 text-amber-700 border-amber-200",
+  Afternoon: "bg-orange-50 text-orange-700 border-orange-200",
+  Evening: "bg-violet-50 text-violet-700 border-violet-200",
+};
+
+const STATUS_CONFIG: Record<string, { label: string; icon: React.ReactNode; cls: string }> = {
+  COMPLETED: {
+    label: "Done",
+    icon: <CheckCircle2 className="h-4 w-4 text-emerald-500" />,
+    cls: "line-through text-slate-400",
+  },
+  ONGOING: {
+    label: "Ongoing",
+    icon: <Clock className="h-4 w-4 text-blue-500 animate-pulse" />,
+    cls: "text-blue-700",
+  },
+  UPCOMING: {
+    label: "Upcoming",
+    icon: <Circle className="h-4 w-4 text-slate-300" />,
+    cls: "text-slate-700",
+  },
+};
+
+export function ItineraryEditor({
+  itineraries,
+  tripId,
+  onRegenerate,
+  onToggleStatus,
+}: {
+  itineraries: DayPlan[];
+  tripId: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onRegenerate: (updatedItineraries: any[]) => void;
+  onToggleStatus: (itineraryId: string, activityId: string, currentStatus: string) => void;
+}) {
+  // Per-day add-place state: dayIndex -> { place, preferredTime }
+  const [addPlaceState, setAddPlaceState] = useState<Record<number, AddPlaceEntry>>({});
+  // Per-day open/close panel
+  const [openPanels, setOpenPanels] = useState<Record<number, boolean>>({});
+  // Per-day regenerating spinner
+  const [regeneratingDay, setRegeneratingDay] = useState<number | null>(null);
+  const [error, setError] = useState<string>("");
+
+  const inputRefs = useRef<Record<number, HTMLInputElement | null>>({});
+
+  function togglePanel(dayIndex: number) {
+    setOpenPanels((prev) => ({ ...prev, [dayIndex]: !prev[dayIndex] }));
+  }
+
+  function getEntry(dayIndex: number): AddPlaceEntry {
+    return addPlaceState[dayIndex] ?? { place: "", preferredTime: "Morning" };
+  }
+
+  function setEntry(dayIndex: number, patch: Partial<AddPlaceEntry>) {
+    setAddPlaceState((prev) => ({
+      ...prev,
+      [dayIndex]: { ...getEntry(dayIndex), ...patch },
+    }));
+  }
+
+  async function handleAddPlace(dayIndex: number) {
+    const entry = getEntry(dayIndex);
+    const placeName = entry.place.trim();
+    if (!placeName) {
+      inputRefs.current[dayIndex]?.focus();
+      return;
+    }
+
+    const day = itineraries[dayIndex];
+
+    // Warn user that existing progress will be reset
+    if (itineraries.some((d) => d.activities.some((a) => a.status === "COMPLETED" || a.status === "ONGOING"))) {
+      const ok = window.confirm(
+        "Regenerating will reset all activity progress (Completed/Ongoing marks). Continue?"
+      );
+      if (!ok) {
+        setRegeneratingDay(null);
+        return;
+      }
+    }
+
+    setRegeneratingDay(day.day);
+    setError("");
+
+    // Build must-include list
+    const mustIncludePlaces = [
+      { day: day.day, place: placeName, preferredTime: entry.preferredTime },
+    ];
+
+    try {
+      const res = await fetch(`/api/trips/${tripId}/generate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mustIncludePlaces }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to regenerate");
+
+      // Reset the input for this day
+      setAddPlaceState((prev) => ({ ...prev, [dayIndex]: { place: "", preferredTime: "Morning" } }));
+      setOpenPanels((prev) => ({ ...prev, [dayIndex]: false }));
+      onRegenerate(data.itineraries);
+    } catch (err: any) {
+      setError(err.message || "Failed to regenerate itinerary.");
+    } finally {
+      setRegeneratingDay(null);
+    }
+  }
+
+  if (itineraries.length === 0) return null;
+
+  return (
+    <div className="space-y-5">
+      {/* Info banner */}
+      <div className="flex items-start gap-2.5 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3">
+        <Info className="mt-0.5 h-4 w-4 flex-shrink-0 text-blue-500" />
+        <p className="text-xs text-blue-700 font-medium leading-relaxed">
+          This itinerary is <span className="font-bold">fully generated by AI</span>. To add a specific place,
+          use the <span className="font-bold">Add a Place</span> button on any day — the AI will regenerate
+          the entire itinerary incorporating your request.
+        </p>
+      </div>
+
+      {error && (
+        <div className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600 font-medium">
+          {error}
+        </div>
+      )}
+
+      {itineraries.map((day, dayIndex) => {
+        const isLoading = regeneratingDay === day.day;
+        const panelOpen = openPanels[dayIndex] ?? false;
+        const entry = getEntry(dayIndex);
+
+        return (
+          <div
+            key={day.id}
+            className={`rounded-2xl border bg-white shadow-sm transition-all duration-200 ${
+              isLoading ? "opacity-60 pointer-events-none" : "border-slate-200"
+            }`}
+          >
+            {/* Day Header */}
+            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+              <div className="flex items-center gap-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-600 text-xs font-bold text-white shadow-sm">
+                  {day.day}
+                </div>
+                <div>
+                  <h3 className="font-bold text-slate-800 text-sm leading-tight">Day {day.day}</h3>
+                  {day.summary ? (
+                    <p className="text-xs text-slate-500 italic mt-0.5 leading-snug max-w-xs truncate" title={day.summary}>
+                      {day.summary}
+                    </p>
+                  ) : (
+                    <p className="text-xs text-slate-400 font-medium">{day.activities.length} activities planned</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Add Place toggle */}
+              <button
+                onClick={() => togglePanel(dayIndex)}
+                disabled={isLoading}
+                className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all border ${
+                  panelOpen
+                    ? "bg-emerald-600 text-white border-emerald-600"
+                    : "bg-white text-emerald-700 border-emerald-300 hover:bg-emerald-50"
+                }`}
+              >
+                {isLoading ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : panelOpen ? (
+                  <ChevronUp className="h-3.5 w-3.5" />
+                ) : (
+                  <Plus className="h-3.5 w-3.5" />
+                )}
+                {isLoading ? "Regenerating…" : panelOpen ? "Cancel" : "Add a Place"}
+              </button>
+            </div>
+
+            {/* Add Place Panel */}
+            {panelOpen && !isLoading && (
+              <div className="px-5 py-4 border-b border-slate-100 bg-slate-50/70">
+                <p className="text-xs font-semibold text-slate-500 mb-3 uppercase tracking-wider">
+                  Request a place for Day {day.day}
+                </p>
+                <div className="flex flex-col sm:flex-row gap-2.5">
+                  <div className="relative flex-1">
+                    <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                    <input
+                      ref={(el) => { inputRefs.current[dayIndex] = el; }}
+                      type="text"
+                      className="w-full rounded-lg border border-slate-200 pl-9 pr-3 py-2 text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-200 placeholder:text-slate-400 bg-white"
+                      placeholder="e.g. Sigiriya Rock, Galle Fort…"
+                      value={entry.place}
+                      onChange={(e) => setEntry(dayIndex, { place: e.target.value })}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleAddPlace(dayIndex);
+                        }
+                      }}
+                      autoFocus
+                    />
+                  </div>
+
+                  {/* Time Slot Picker */}
+                  <div className="flex gap-1.5">
+                    {(["Morning", "Afternoon", "Evening"] as TimeSlot[]).map((slot) => (
+                      <button
+                        key={slot}
+                        type="button"
+                        onClick={() => setEntry(dayIndex, { preferredTime: slot })}
+                        className={`flex items-center gap-1 rounded-lg border px-2.5 py-2 text-xs font-semibold transition-all ${
+                          entry.preferredTime === slot
+                            ? TIME_COLORS[slot] + " border-current"
+                            : "bg-white border-slate-200 text-slate-500 hover:bg-slate-50"
+                        }`}
+                      >
+                        {TIME_ICONS[slot]}
+                        <span className="hidden sm:inline">{slot}</span>
+                      </button>
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={() => handleAddPlace(dayIndex)}
+                    disabled={!entry.place.trim()}
+                    className="flex items-center justify-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                  >
+                    <Sparkles className="h-3.5 w-3.5" />
+                    Regenerate with this place
+                  </button>
+                </div>
+                <p className="mt-2 text-[11px] text-slate-400">
+                  The AI will rebuild the full itinerary ensuring this place is included at the{" "}
+                  <strong>{entry.preferredTime}</strong> slot on Day {day.day}.
+                </p>
+              </div>
+            )}
+
+            {/* Activities — Read-Only AI View */}
+            <div className="divide-y divide-slate-100">
+              {day.activities.map((act, actIdx) => {
+                const status = act.status ?? "UPCOMING";
+                const statusCfg = STATUS_CONFIG[status] ?? STATUS_CONFIG.UPCOMING;
+                const timeColor = TIME_COLORS[act.timeOfDay] ?? "bg-slate-100 text-slate-600 border-slate-200";
+
+                return (
+                  <div
+                    key={act.id}
+                    className="flex items-start gap-4 px-5 py-4 hover:bg-slate-50/60 transition-colors group"
+                  >
+                    {/* Status Toggle */}
+                    <button
+                      onClick={() => onToggleStatus(day.id, act.id, status)}
+                      className="mt-0.5 flex-shrink-0 transition hover:scale-110"
+                      title="Toggle status"
+                    >
+                      {statusCfg.icon}
+                    </button>
+
+                    {/* Activity Body */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2 mb-1">
+                        {/* Time badge */}
+                        <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-bold ${timeColor}`}>
+                          {TIME_ICONS[act.timeOfDay]}
+                          {act.timeOfDay}
+                        </span>
+                        {/* Activity number */}
+                        <span className="text-[10px] font-bold text-slate-300">#{actIdx + 1}</span>
+                      </div>
+                      <p className={`text-sm font-semibold ${statusCfg.cls}`}>{act.title}</p>
+                      {act.suggestedAttraction && (
+                        <p className="mt-0.5 flex items-center gap-1 text-xs text-slate-500">
+                          <MapPin className="h-3 w-3 flex-shrink-0" />
+                          {act.suggestedAttraction}
+                        </p>
+                      )}
+                      {act.travelTime && (
+                        <p className="flex items-center gap-1 text-xs text-slate-400 mt-0.5">
+                          <Clock className="h-3 w-3 flex-shrink-0" />
+                          Travel: {act.travelTime}
+                        </p>
+                      )}
+                      {act.notes && (
+                        <p className="mt-1 text-xs text-slate-500 italic bg-slate-50 rounded-md px-2 py-1 border border-slate-100">
+                          {act.notes}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Status pill */}
+                    <button
+                      onClick={() => onToggleStatus(day.id, act.id, status)}
+                      className={`flex-shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide transition-all border border-transparent ${
+                        status === "COMPLETED"
+                          ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
+                          : status === "ONGOING"
+                          ? "bg-blue-100 text-blue-700 hover:bg-blue-200"
+                          : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                      }`}
+                    >
+                      {statusCfg.label}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}

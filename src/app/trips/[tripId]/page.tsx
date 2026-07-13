@@ -21,7 +21,12 @@ export default async function TripDetailsPage({ params }: { params: Promise<{ tr
     },
     include: {
       itineraries: {
-        orderBy: { day: 'asc' }
+        orderBy: { day: 'asc' },
+        include: {
+          activityItems: {
+            orderBy: { order: 'asc' }
+          }
+        }
       }
     }
   });

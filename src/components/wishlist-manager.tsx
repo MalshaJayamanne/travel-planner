@@ -33,10 +33,6 @@ export function WishlistManager() {
   const [message, setMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
-  useEffect(() => {
-    void loadItems();
-  }, []);
-
   async function loadItems() {
     const response = await fetch("/api/wishlist");
     if (response.ok) {
@@ -44,6 +40,10 @@ export function WishlistManager() {
       setItems(data);
     }
   }
+
+  useEffect(() => {
+    void loadItems();
+  }, []);
 
   function validateForm() {
     const nextErrors: Partial<Record<keyof WishlistFormState, string>> = {};

@@ -12,11 +12,11 @@ type Rate = {
 };
 
 const WIDGET_PAIRS: [string, string][] = [
-  ["USD", "EUR"],
-  ["USD", "GBP"],
-  ["USD", "JPY"],
-  ["USD", "AUD"],
-  ["USD", "INR"],
+  ["LKR", "USD"],
+  ["LKR", "EUR"],
+  ["LKR", "GBP"],
+  ["LKR", "JPY"],
+  ["LKR", "AUD"],
 ];
 
 export function CurrencyWidget() {
@@ -28,8 +28,8 @@ export function CurrencyWidget() {
     async function loadRates() {
       try {
         setLoading(true);
-        // Fetch all rates from USD base
-        const res = await fetch("/api/currency/rates?base=USD");
+        // Fetch all rates from the main system currency base
+        const res = await fetch("/api/currency/rates?base=LKR");
         if (!res.ok) throw new Error("Failed to fetch");
         const data = await res.json();
 

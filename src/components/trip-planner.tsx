@@ -12,6 +12,9 @@ type Preference = {
 
 type TripFormState = {
   title: string;
+  startLocation: string;
+  country: string;
+  city: string;
   destination: string;
   startDate: string;
   endDate: string;
@@ -30,6 +33,9 @@ type PreferenceFormState = {
 
 const emptyTripForm: TripFormState = {
   title: "",
+  startLocation: "",
+  country: "Sri Lanka",
+  city: "",
   destination: "",
   startDate: "",
   endDate: "",
@@ -37,7 +43,7 @@ const emptyTripForm: TripFormState = {
 
 const emptyBudgetForm: BudgetFormState = {
   travelers: "2",
-  dailyBudget: "120",
+  dailyBudget: "12000",
   durationDays: "5",
 };
 
@@ -55,10 +61,46 @@ export function TripPlanner() {
   const [isSavingTrip, setIsSavingTrip] = useState(false);
   const [isSavingPreferences, setIsSavingPreferences] = useState(false);
   const [message, setMessage] = useState("");
+  const [startLocationSuggestions, setStartLocationSuggestions] = useState<string[]>([]);
+  const [destinationSuggestions, setDestinationSuggestions] = useState<string[]>([]);
 
   useEffect(() => {
     void loadData();
   }, []);
+
+  useEffect(() => {
+    const query = tripForm.startLocation.trim();
+    if (!query) {
+      setStartLocationSuggestions([]);
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      void fetch(`/api/destinations?search=${encodeURIComponent(query)}`)
+        .then((res) => res.json())
+        .then((data) => setStartLocationSuggestions((data || []).map((item: { name: string }) => item.name)))
+        .catch(() => setStartLocationSuggestions([]));
+    }, 300);
+
+    return () => window.clearTimeout(timeout);
+  }, [tripForm.startLocation]);
+
+  useEffect(() => {
+    const query = tripForm.destination.trim();
+    if (!query) {
+      setDestinationSuggestions([]);
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      void fetch(`/api/destinations?search=${encodeURIComponent(query)}`)
+        .then((res) => res.json())
+        .then((data) => setDestinationSuggestions((data || []).map((item: { name: string }) => item.name)))
+        .catch(() => setDestinationSuggestions([]));
+    }, 300);
+
+    return () => window.clearTimeout(timeout);
+  }, [tripForm.destination]);
 
   async function loadData() {
     const [tripResponse, preferencesResponse] = await Promise.all([
@@ -102,7 +144,10 @@ export function TripPlanner() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title: tripForm.title,
+          startLocation: tripForm.startLocation,
           destination: tripForm.destination,
+          country: tripForm.country,
+          city: tripForm.city,
           startDate: tripForm.startDate
             ? new Date(`${tripForm.startDate}T00:00:00`).toISOString()
             : new Date().toISOString(),
@@ -185,23 +230,69 @@ export function TripPlanner() {
                 <input
                   className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-500"
                   onChange={(event) => setTripForm((current) => ({ ...current, title: event.target.value }))}
-                  placeholder="Santorini escape"
+                  placeholder="Kandy Spiritual Journey"
                   required
                   value={tripForm.title}
                 />
               </label>
 
               <label className="block text-sm font-medium text-slate-700">
-                <span className="mb-1.5 block">Destination</span>
+                <span className="mb-1.5 block">Start Location</span>
                 <input
                   className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-500"
-                  onChange={(event) => setTripForm((current) => ({ ...current, destination: event.target.value }))}
-                  placeholder="Greece"
+                  list="start-location-suggestions"
+                  onChange={(event) => setTripForm((current) => ({ ...current, startLocation: event.target.value }))}
+                  placeholder="Colombo, Sri Lanka"
+                  value={tripForm.startLocation}
+                />
+                <datalist id="start-location-suggestions">
+                  {startLocationSuggestions.map((suggestion) => (
+                    <option key={suggestion} value={suggestion} />
+                  ))}
+                </datalist>
+              </label>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <label className="block text-sm font-medium text-slate-700">
+                <span className="mb-1.5 block">Country</span>
+                <input
+                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-500"
+                  onChange={(event) => setTripForm((current) => ({ ...current, country: event.target.value }))}
+                  placeholder="Sri Lanka"
                   required
-                  value={tripForm.destination}
+                  value={tripForm.country}
+                />
+              </label>
+
+              <label className="block text-sm font-medium text-slate-700">
+                <span className="mb-1.5 block">City</span>
+                <input
+                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-500"
+                  onChange={(event) => setTripForm((current) => ({ ...current, city: event.target.value }))}
+                  placeholder="Kandy"
+                  required
+                  value={tripForm.city}
                 />
               </label>
             </div>
+
+            <label className="block text-sm font-medium text-slate-700">
+              <span className="mb-1.5 block">Final Destination</span>
+              <input
+                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-500"
+                list="destination-suggestions"
+                onChange={(event) => setTripForm((current) => ({ ...current, destination: event.target.value }))}
+                placeholder="Temple of the Sacred Tooth Relic"
+                required
+                value={tripForm.destination}
+              />
+              <datalist id="destination-suggestions">
+                {destinationSuggestions.map((suggestion) => (
+                  <option key={suggestion} value={suggestion} />
+                ))}
+              </datalist>
+            </label>
 
             <div className="grid gap-4 md:grid-cols-2">
               <label className="block text-sm font-medium text-slate-700">
@@ -232,9 +323,10 @@ export function TripPlanner() {
                 <div>
                   <p className="text-sm font-semibold text-slate-800">Budget calculator</p>
                   <p className="text-sm text-slate-600">Preview a rough trip estimate.</p>
+                  <p className="mt-1 text-xs text-slate-500">All estimated costs are calculated for one traveler.</p>
                 </div>
                 <div className="rounded-full bg-emerald-100 px-3 py-1 text-sm font-semibold text-emerald-700">
-                  ${estimatedBudget.toLocaleString()}
+                  Rs. {estimatedBudget.toLocaleString()}
                 </div>
               </div>
 
@@ -352,10 +444,12 @@ export function TripPlanner() {
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <h3 className="font-semibold text-slate-900 transition">{trip.title}</h3>
-                      <p className="mt-1 text-sm text-slate-600">{trip.destination}</p>
+                      <p className="mt-1 text-sm text-slate-600">
+                        {trip.destination}{trip.city ? `, ${trip.city}` : ""}{trip.country ? `, ${trip.country}` : ""}
+                      </p>
                     </div>
                     <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
-                      ${trip.budget.toLocaleString()}
+                      Rs. {trip.budget.toLocaleString()}
                     </span>
                   </div>
                   <p className="mt-3 text-sm text-slate-600">

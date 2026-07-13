@@ -48,3 +48,10 @@ next-env.d.ts
 # prisma
 node_modules/.prisma/
 prisma/generated/
+
+# local uploads fallback
+/public/uploads/*
+!/public/uploads/.gitkeep
+
+# System metadata
+.gemini/

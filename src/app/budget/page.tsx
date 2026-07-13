@@ -40,7 +40,7 @@ export default async function BudgetPage() {
                 </div>
                 <h2 className="text-sm font-semibold text-slate-500">Total Estimated Budget</h2>
               </div>
-              <p className="text-3xl font-bold text-slate-800">${totalBudget.toLocaleString()}</p>
+              <p className="text-3xl font-bold text-slate-800">Rs. {totalBudget.toLocaleString()}</p>
             </section>
 
             <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm flex flex-col justify-center">
@@ -87,7 +87,7 @@ export default async function BudgetPage() {
                     </div>
                     <div className="text-right">
                       <p className="font-bold text-emerald-600">
-                        ${trip.budget.toLocaleString()}
+                        Rs. {trip.budget.toLocaleString()}
                       </p>
                       <p className="text-xs text-slate-400">Estimated</p>
                     </div>

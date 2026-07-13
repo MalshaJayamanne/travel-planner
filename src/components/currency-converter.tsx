@@ -45,8 +45,8 @@ function CurrencySelect({ value, onChange, id }: CurrencySelectProps) {
 
 export function CurrencyConverter() {
   const [amount, setAmount] = useState("100");
-  const [from, setFrom] = useState("USD");
-  const [to, setTo] = useState("EUR");
+  const [from, setFrom] = useState("LKR");
+  const [to, setTo] = useState("USD");
   const [result, setResult] = useState<ConversionResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -54,12 +54,12 @@ export function CurrencyConverter() {
 
   // Quick conversion pairs for travel
   const quickPairs = [
-    { from: "USD", to: "EUR" },
-    { from: "USD", to: "GBP" },
-    { from: "USD", to: "JPY" },
-    { from: "EUR", to: "USD" },
-    { from: "GBP", to: "USD" },
-    { from: "AUD", to: "USD" },
+    { from: "LKR", to: "USD" },
+    { from: "LKR", to: "EUR" },
+    { from: "LKR", to: "GBP" },
+    { from: "LKR", to: "JPY" },
+    { from: "USD", to: "LKR" },
+    { from: "EUR", to: "LKR" },
   ];
 
   const handleConvert = useCallback(async () => {
@@ -271,6 +271,7 @@ export function CurrencyConverter() {
             {[
               { code: "EUR", name: "Euro" },
               { code: "GBP", name: "British Pound" },
+              { code: "LKR", name: "Sri Lankan Rupee" },
               { code: "JPY", name: "Japanese Yen" },
               { code: "AUD", name: "Australian Dollar" },
               { code: "INR", name: "Indian Rupee" },
